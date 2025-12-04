@@ -2,21 +2,39 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.models.openai import OpenAIChatModel
 from database import VectorDB
 from prompts import PromptConfig
 
 # Load environment variables
 load_dotenv()
 
-# CRITICAL: Set up OpenRouter configuration
-OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
-if not OPENROUTER_API_KEY:
-    raise ValueError("OPENROUTER_API_KEY not found in environment variables")
+# MODEL CONFIGURATION
+MODEL_PROVIDER = os.getenv('MODEL_PROVIDER', 'openrouter')  # 'openrouter' or 'local'
+
+def get_model():
+    """
+    Returns the appropriate model based on MODEL_PROVIDER setting.
+    
+    Returns:
+        str or OpenAIChatModel: Model identifier for the selected provider
+    """
+    if MODEL_PROVIDER == 'local':
+        # LMStudio default endpoint - using openai: prefix for compatibility
+        return 'openai:qwen3-4b'
+    elif MODEL_PROVIDER == 'openrouter':
+        OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
+        if not OPENROUTER_API_KEY:
+            raise ValueError("OPENROUTER_API_KEY not found in environment variables")
+        return 'openrouter:deepseek/deepseek-v3.2'
+    else:
+        raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be 'openrouter' or 'local'")
 
 # DEFINE DEPENDENCIES
 class AgentDeps(BaseModel):
     """
     Defines the dependencies required by the agent during execution.
+    
     Attributes:
         db (VectorDB): The vector database instance for RAG operations.
     """
@@ -25,7 +43,7 @@ class AgentDeps(BaseModel):
 
 # DEFINE THE AGENT
 rottermaatje_agent = Agent(
-    model='openrouter:deepseek/deepseek-v3.2',
+    model=get_model(),
     deps_type=AgentDeps,
     system_prompt=PromptConfig.get_system_prompt(),
 )
@@ -35,11 +53,14 @@ rottermaatje_agent = Agent(
 async def search_knowledge_base(ctx: RunContext[AgentDeps], query: str) -> str:
     """
     Search the internal database for specific information.
+    
     This tool queries the vector database for details regarding shelters,
     medical help, or procedures. It should be used for factual user requests.
+    
     Args:
         ctx (RunContext[AgentDeps]): The context containing agent dependencies.
         query (str): The search term or question to query the database with.
+    
     Returns:
         str: A formatted string of search results or a default message if none found.
     """

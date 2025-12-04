@@ -14,3 +14,8 @@ Om de agent te voorzien van een robuuste system prompt, guardrails en veiligheid
 - Versiebeheer: Track prompt aanpassingen los van de agent architecture
 - A/B Testing: Gemakkelijk prompt configuraties testen en vergelijken
 - Snelle iteratie: Update prompts zonder de code te hoeven aanpassen
+
+04-12-2025
+Projectoverleg met de groep en Rachid, hieruit hebben wij positieve feedback gekregen op onze voortgang en tips om lokale LLM's te testen door middel van LMStudio, daarnaast hebben we tool usage besproken en zijn we van plan om MCP's te gebruiken. We zullen de regels van de tool usage in de system prompt beschrijven.
+
+Ik heb Qwen3-vl-4b getest en het werkt erg snel, alleen valt het model vaak in loops waardoor het gaat hallucineren, de context van dit model is tevens erg klein waardoor ik beter een model met grotere context window kan proberen.
