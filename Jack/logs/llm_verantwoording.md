@@ -12,7 +12,7 @@
     * Best mix of speed and smarts for this specific laptop.
 * **Best for Speed:** **Llama 3.2 3B Instruct** (Q6 or Q8 Quantization)
     * Uses less VRAM (~2.5 GB).
-    * Extremely snappy; great for quick chats and roleplay.
+    * Extremely snappy; great for quick chats and roleplay. 
 * **Best for Coding/Logic:** **Qwen2.5-Coder 3B**
     * Punches above its weight for programming tasks while staying fast.
 * **Best for Complex Reasoning (Slow):** **Phi-3.5 Mini** (3.8B) or **Qwen 2.5 7B**

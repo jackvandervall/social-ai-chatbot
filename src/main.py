@@ -2,93 +2,74 @@ import asyncio
 import os
 from typing import Optional
 from dotenv import load_dotenv
-from agent import rottermaatje_agent, AgentDeps
-from database import VectorDB 
-from prompts import PromptConfig
+from src.agents.chatbot import rottermaatje_agent, AgentDeps
+from src.services.vectordb import VectorDB
+from src.core.prompts import PromptConfig
+from src.agents.triage import triage_agent, TriageStatus
 
 # Load .env variables
 load_dotenv()
 
-class GuardrailsManager:
-    """Centralized guardrails management."""
-    
-    @staticmethod
-    async def pre_process(user_input: str) -> Optional[str]:
-        """
-        Pre-processing checks. Returns error message if input should be blocked.
-        Returns None if input passes all checks.
-        """
-        # Check 1: Empty input
-        if not user_input.strip():
-            return "Je bericht is leeg. Typ iets om te beginnen."
-        
-        # Check 2: Input too long
-        if len(user_input) > 1000:
-            return "Je bericht is te lang. Probeer het in kortere delen op te splitsen."
-        
-        # Check 3: Spam detection (repeated characters with less than three being unique)
-        if len(set(user_input)) < 3 and len(user_input) > 10:
-            return "Dit lijkt geen geldige vraag te zijn."
-        
-        return None  # All checks passed
-    
-    @staticmethod
-    async def detect_emergency(user_input: str) -> bool:
-        """Detect if input contains emergency keywords."""
-        return PromptConfig.check_emergency_keywords(user_input)
-    
-    @staticmethod
-    async def post_process(response: str, user_input: str) -> str:
-        """
-        Post-processing modifications to agent response.
-        """
-        # Add emergency banner if needed
-        if await GuardrailsManager.detect_emergency(user_input):
-            emergency_banner = f"\n\n🚨 {PromptConfig.SAFETY_DISCLAIMERS['emergency']}"
-            response = emergency_banner + "\n\n" + response
-        
-        # Truncate if max_length is set
-        max_length = PromptConfig.GUARDRAILS["max_response_length"]
-        if max_length is not None and len(response) > max_length:
-            response = response[:max_length] + "...\n\n(Antwoord ingekort)"        
-            
-        return response
 
-# Run agent with pre- and post-processing guardrails
+async def basic_pre_checks(user_input: str) -> Optional[str]:
+    """Basic input validation."""
+    if not user_input.strip():
+        return "Je bericht is leeg. Typ iets om te beginnen."
+    if len(user_input) > 1000:
+        return "Je bericht is te lang. Probeer het in kortere delen op te splitsen."
+    if len(set(user_input)) < 3 and len(user_input) > 10:
+        return "Dit lijkt geen geldige vraag te zijn."
+    return None
+
+
 async def main():
     db = VectorDB()
-    deps = AgentDeps(db=db)
-    guardrails = GuardrailsManager()
-    
     print("--- Rottermaatje 2.0 (Terminal Mode) ---")
     print("Type 'exit' om te stoppen.\n")
-    
+
     while True:
         user_input = input("Gebruiker: ")
         if user_input.lower() in ["exit", "stop", "quit"]:
             print("Tot ziens!")
             break
-        
-        try:
-            # PRE-PROCESSING GUARDRAILS
-            error_msg = await guardrails.pre_process(user_input)
-            if error_msg:
-                print(f"Rottermaatje: {error_msg}\n")
-                continue
-            
-            # Run agent
-            result = await rottermaatje_agent.run(user_input, deps=deps)
-            
-            # POST-PROCESSING GUARDRAILS
-            final_response = await guardrails.post_process(
-                result.output, 
-                user_input
-            )
-            
-            print(f"Rottermaatje: {final_response}\n")
-            
-        except Exception as e:
-            print(f"Error: {e}\n")
+
+        # Basic pre-checks
+        error_msg = await basic_pre_checks(user_input)
+        if error_msg:
+            print(f"Rottermaatje: {error_msg}\n")
+            continue
+
+        # Triage step
+        triage_result = await triage_agent.run(user_input)
+        status: TriageStatus = triage_result.output
+
+        # Print triage summary
+        print(f"[Triage] Topic: {status.topic}, Language: {status.language}, Emergency: {status.is_emergency}, Disclaimer: {status.disclaimer_type}")
+        print(f"[Reasoning] {status.reasoning}\n")
+
+        # If emergency, show alert and optionally block
+        if status.is_emergency:
+            disclaimer = PromptConfig.get_disclaimer(status.disclaimer_type)
+            if disclaimer:
+                print(f"Rottermaatje: {disclaimer}\n")
+            # We don't block, but we prepend the disclaimer in the response.
+            # However, we can choose to not run the main agent and just show the emergency message.
+            # For now, we continue to run the main agent but with the disclaimer.
+
+        # Prepare dependencies for main agent (including triage data)
+        deps = AgentDeps(db=db, triage_data=status)
+
+        # Run main agent
+        result = await rottermaatje_agent.run(user_input, deps=deps)
+
+        # Post-process: if emergency, we already have the disclaimer, but we can also add it to the response.
+        final_response = result.output
+        if status.disclaimer_type != 'none':
+            disclaimer = PromptConfig.get_disclaimer(status.disclaimer_type)
+            final_response = disclaimer + "\n\n" + final_response
+
+        print(f"Rottermaatje: {final_response}\n")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

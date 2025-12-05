@@ -2,33 +2,18 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic_ai import Agent, RunContext
+from typing import Optional
+from agents.triage import TriageStatus
 from pydantic_ai.models.openai import OpenAIChatModel
-from database import VectorDB
-from prompts import PromptConfig
+from services.vectordb import VectorDB
+from core.prompts import PromptConfig
+from core.llm import get_model
 
 # Load environment variables
 load_dotenv()
 
 # MODEL CONFIGURATION
 MODEL_PROVIDER = os.getenv('MODEL_PROVIDER', 'openrouter')  # 'openrouter' or 'local'
-
-def get_model():
-    """
-    Returns the appropriate model based on MODEL_PROVIDER setting.
-    
-    Returns:
-        str or OpenAIChatModel: Model identifier for the selected provider
-    """
-    if MODEL_PROVIDER == 'local':
-        # LMStudio default endpoint - using openai: prefix for compatibility
-        return 'openai:qwen3-4b'
-    elif MODEL_PROVIDER == 'openrouter':
-        OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
-        if not OPENROUTER_API_KEY:
-            raise ValueError("OPENROUTER_API_KEY not found in environment variables")
-        return 'openrouter:deepseek/deepseek-v3.2'
-    else:
-        raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be 'openrouter' or 'local'")
 
 # DEFINE DEPENDENCIES
 class AgentDeps(BaseModel):
@@ -40,6 +25,7 @@ class AgentDeps(BaseModel):
     """
     model_config = ConfigDict(arbitrary_types_allowed=True)
     db: VectorDB
+    triage_data: Optional[TriageStatus] = None
 
 # DEFINE THE AGENT
 rottermaatje_agent = Agent(
@@ -48,7 +34,7 @@ rottermaatje_agent = Agent(
     system_prompt=PromptConfig.get_system_prompt(),
 )
 
-# DEFINE TOOLS (RAG)
+# RAG tool
 @rottermaatje_agent.tool
 async def search_knowledge_base(ctx: RunContext[AgentDeps], query: str) -> str:
     """
@@ -68,3 +54,15 @@ async def search_knowledge_base(ctx: RunContext[AgentDeps], query: str) -> str:
     if not results:
         return "Geen specifieke informatie gevonden in de database."
     return "- " + "\n- ".join(results)
+
+# Classification tool
+@rottermaatje_agent.tool
+async def get_triage_info(ctx: RunContext[AgentDeps]) -> str:
+    """
+    Get the triage classification for the current user input.
+    Always call this first to understand topic, language, emergency status, and sensitivity.
+    """
+    if ctx.deps.triage_data:
+        td = ctx.deps.triage_data
+        return f"Triage: Topic='{td.topic}', Language='{td.language}', Emergency={td.is_emergency}, Disclaimer='{td.disclaimer_type}'. Reason: {td.reasoning}"
+    return "No triage data."
