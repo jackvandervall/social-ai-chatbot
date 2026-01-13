@@ -3,7 +3,7 @@ import os
 from typing import Optional
 from dotenv import load_dotenv
 from src.agents.chatbot import rottermaatje_agent, AgentDeps
-from src.services.vectordb import VectorDB
+from src.services.pgvectordb import VectorDB
 from src.core.prompts import PromptConfig
 from src.agents.triage import triage_agent, TriageStatus
 

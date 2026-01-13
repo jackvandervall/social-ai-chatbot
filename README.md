@@ -85,7 +85,6 @@ python src/main.py
 
 #### Web UI (Chainlit)
 ```
-chainlit run src/web/app.py
+uv run chainlit run src/web/app.py
 ```
 - Open `http://localhost:8000`
-- Triage step is visible as a "Veiligheidscheck" step in the UI, with emergency alerts when needed.

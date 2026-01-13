@@ -5,6 +5,8 @@ load_dotenv()
 
 MODEL_PROVIDER = os.getenv('MODEL_PROVIDER', 'openrouter')
 
+# For local, set MODEL_PROVIDER to 'local' in .env
+# For OpenRouter API, set MODEL_PROVIDER to 'openrouter' in .env
 def get_model():
     """
     Returns the model configuration based on MODEL_PROVIDER.
@@ -15,6 +17,6 @@ def get_model():
         OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
         if not OPENROUTER_API_KEY:
             raise ValueError("OPENROUTER_API_KEY not found in environment variables")
-        return 'openrouter:deepseek/deepseek-v3.2'
+        return 'openrouter:qwen/qwen3-235b-a22b:free'
     else:
         raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be 'openrouter' or 'local'")

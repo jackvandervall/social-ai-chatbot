@@ -6,7 +6,7 @@ import chainlit as cl
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from agents.chatbot import rottermaatje_agent, AgentDeps
-from services.vectordb import VectorDB
+from services.pgvectordb import VectorDB
 from core.prompts import PromptConfig
 from agents.triage import triage_agent, TriageStatus
 

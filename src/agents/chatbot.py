@@ -5,7 +5,7 @@ from pydantic_ai import Agent, RunContext
 from typing import Optional
 from agents.triage import TriageStatus
 from pydantic_ai.models.openai import OpenAIChatModel
-from services.vectordb import VectorDB
+from services.pgvectordb import VectorDB
 from core.prompts import PromptConfig
 from core.llm import get_model
 
@@ -53,7 +53,8 @@ async def search_knowledge_base(ctx: RunContext[AgentDeps], query: str) -> str:
     results = await ctx.deps.db.search(query)
     if not results:
         return "Geen specifieke informatie gevonden in de database."
-    return "- " + "\n- ".join(results)
+    contents = [r["content"] for r in results]
+    return "- " + "\n- ".join(contents)
 
 # Classification tool
 @rottermaatje_agent.tool

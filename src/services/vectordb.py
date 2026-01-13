@@ -8,7 +8,7 @@ class VectorDB:
     Abstraction for the pgvector database.
     """
     def __init__(self):
-        self.db_url = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/rottermaatje")
+        self.db_url = os.getenv("DATABASE_URL", "postgresql://postgres:[YOUR_PASSWORD]@db.cqzcbfgnpyyiknfzybom.supabase.co:5432/postgres")
         self.mock_mode = True  # Set to False when you have a real DB running
 
     async def search(self, query: str, limit: int = 3) -> List[str]:
@@ -28,15 +28,4 @@ class VectorDB:
             matches = [k for k in mock_knowledge if any(word in k.lower() for word in query.lower().split())]
             return matches if matches else [mock_knowledge[0]]  # Always return a list
         
-        # If mock_mode is False but real implementation not ready:
-        return []  # This line needs to be INSIDE the function
-        
-        # REAL IMPLEMENTATION SKELETON (Uncomment later)
-        # conn = await asyncpg.connect(self.db_url)
-        # try:
-        #     embedding = await get_openai_embedding(query) 
-        #     sql = "SELECT content FROM items ORDER BY embedding <-> $1 LIMIT $2"
-        #     rows = await conn.fetch(sql, str(embedding), limit)
-        #     return [r['content'] for r in rows]
-        # finally:
-        #     await conn.close()
+        return []  

@@ -1,0 +1,245 @@
+[
+  {
+    "vraag": "Ik ben dakloos uit Rotterdam en zoek een slaapplaats.",
+    "antwoord": "Bij Centraal Onthaal, Delftseplein 29 kunt u vragen naar een Centraal Onthaalpas, daarmee krijgt u toegang tot de nachtopvang (NAS).",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["Centraal Onthaal", "NAS", "Delftseplein", "CO-pas"]
+    }
+  },
+  {
+    "vraag": "Wat kost de nachtopvang?",
+    "antwoord": "De opvangkosten worden afgetrokken van uw uitkering.",
+    "metadata": {
+      "categorie": "Financieel",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["kosten", "eigen bijdrage", "uitkering"]
+    }
+  },
+  {
+    "vraag": "Waar vind ik de nachtopvang in Rotterdam?",
+    "antwoord": "De NAS is aan de vijverhofstraat 35-37 in Rotterdam.",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["NAS", "locatie", "Vijverhofstraat"]
+    }
+  },
+  {
+    "vraag": "De gemeente geeft mij geen Centraal Onthaalpas wat kan ik doen?",
+    "antwoord": "U kunt in bezwaar tegen het besluit. Vraag juridische hulp bij het juridisch loket.",
+    "metadata": {
+      "categorie": "Juridisch",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["bezwaar", "juridisch loket", "weigering"]
+    }
+  },
+  {
+    "vraag": "Ik heb geen geld waar kan ik eten?",
+    "antwoord": "Er is de hele dag gratis brood, koffie en thee in de Pauluskerk, Mauritsweg 20 te Rotterdam. Van maandag-vrijdag om 16.45 uur gaat de deur open voor een warme maaltijd (1 euro). In het weekend is er regelmatig soep om 13 of 17 uur. Op woensdag gratis soep bij station Blaak. Zusters aan de 's Gravendijkwal 13 delen op donderdag en zaterdag eten uit. Gaarkeuken: Proveniersstraat 6, aanvang 17 uur (ma-vr).",
+    "metadata": {
+      "categorie": "Voeding",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["Pauluskerk", "Gaarkeuken", "gratis eten", "soep"]
+    }
+  },
+  {
+    "vraag": "Waar kan ik douchen?",
+    "antwoord": "Douchegelegenheid is er bij: NAS (Vijverhofstraat 35-37, met CO-pas), Pauluskerk (Mauritsweg 20, vrij toegang), Stichting Ontmoeting ('s Gravendijkwal 95, met toegangspas), De Sluis (Westzeedijk 493, met pas).",
+    "metadata": {
+      "categorie": "Hygiëne",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["douchen", "wassen", "sanitair"]
+    }
+  },
+  {
+    "vraag": "Ik ben niet verzekerd en heb hulp van een huisarts nodig.",
+    "antwoord": "Ga naar Straatzorg Rotterdam, Mathenesserlaan 433. Tel: 010-3188188. Inloopspreekuur: ma-di en do tussen 9-11.00 uur.",
+    "metadata": {
+      "categorie": "Medisch",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["Straatzorg", "huisarts", "onverzekerd", "zorg"]
+    }
+  },
+  {
+    "vraag": "Ik ben dakloos en zoek een huis.",
+    "antwoord": "Schrijf u in bij Woonnet Rijnmond of andere corporaties. Wachttijd is enkele jaren (55+) tot gemiddeld 9 jaar (anderen). Zoek particulier of vraag netwerk om een kamer.",
+    "metadata": {
+      "categorie": "Wonen",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["Woonnet Rijnmond", "sociale huur", "wachttijd"]
+    }
+  },
+  {
+    "vraag": "Ik ben dakloos en wil een postadres.",
+    "antwoord": "Vraag aan bij gemeente Rotterdam (website of Delftsepoort 29). Vermeld minimaal 3 slaapadressen en oorzaak dakloosheid.",
+    "metadata": {
+      "categorie": "Administratie",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["postadres", "briefadres", "gemeente"]
+    }
+  },
+  {
+    "vraag": "Ik kom uit Nederlandse Antillen, heb een Nederlands paspoort, maar geen BSN.",
+    "antwoord": "Vraag een BSN aan bij een RNI loket bij een aantal gemeenten in Nederland (afspraak maken via website).",
+    "metadata": {
+      "categorie": "Administratie",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["BSN", "RNI", "Antillen", "registratie"]
+    }
+  },
+  {
+    "vraag": "Ik heb geen schone kleding, waar kan ik die krijgen?",
+    "antwoord": "Pauluskerk (Mauritsweg 20): ma, wo, vr 10-11 uur gratis kleding. Weggeefwinkel (Schoterbosstraat 4): elke woensdag 10-14 uur.",
+    "metadata": {
+      "categorie": "Kleding",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["kledinguitgifte", "Pauluskerk", "Weggeefwinkel"]
+    }
+  },
+  {
+    "vraag": "Ik ben Nederlander, heb geen ID meer en geen geld voor paspoort.",
+    "antwoord": "1. Doe aangifte van vermissing bij politie. 2. Vraag bijzondere bijstand voor ID-kosten bij Sociale Dienst (Coolsingel 40).",
+    "metadata": {
+      "categorie": "Juridisch",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["ID-kaart", "paspoort", "bijzondere bijstand", "identiteitsbewijs"]
+    }
+  },
+  {
+    "vraag": "Ik kom uit Europees land en wil terug naar mijn land, maar heb geen geld.",
+    "antwoord": "Vraag hulp aan Stichting Barka (030-2689242) of Stichting Ontmoeting ('s Gravendijkwal 95, spreekuur 9.30-11.30).",
+    "metadata": {
+      "categorie": "Remigratie",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["terugkeer", "Barka", "EU", "repatriëring"]
+    }
+  },
+  {
+    "vraag": "Ik ben Nederlander, dakloos en heb geen werk en geen inkomen.",
+    "antwoord": "Net werkloos? Vraag WW aan bij UWV. Langer werkloos? Vraag Bijstand bij Sociale Dienst (Coolsingel 40).",
+    "metadata": {
+      "categorie": "Financieel",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["uitkering", "WW", "Bijstand", "UWV", "Sociale Dienst"]
+    }
+  },
+  {
+    "vraag": "Ik ben verslaafd en wil afkicken.",
+    "antwoord": "Ga naar je huisarts voor verwijzing. Geen huisarts? Ga naar Straatzorg Rotterdam (Mathenesserlaan 433, 010-3188188).",
+    "metadata": {
+      "categorie": "Medisch",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["verslaving", "detox", "afkicken", "kliniek"]
+    }
+  },
+  {
+    "vraag": "Ik ben dakloos en kom NIET uit Rotterdam kan ik in Rotterdam naar de nachtopvang?",
+    "antwoord": "Nee, meld je bij de gemeente waar je het laatst ingeschreven stond. Rotterdam biedt niet automatisch opvang vanwege regiobinding.",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["regiobinding", "buiten Rotterdam", "toegang"]
+    }
+  },
+  {
+    "vraag": "Ik ben EU burger zonder werk en zoek een slaapplaats. Ik heb nog niet gewerkt in Nederland.",
+    "antwoord": "U heeft geen toegang tot opvang in Rotterdam. U moet zelf slaapplaats en werk zoeken.",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["EU", "arbeidsmigrant", "geen recht"]
+    }
+  },
+  {
+    "vraag": "Ik heb geen geldige papieren (ongedocumenteerd).",
+    "antwoord": "Steunpunt Ongedocumenteerden Pauluskerk (Mauritsweg 20). Spreekuur ma en do 10-12 uur.",
+    "metadata": {
+      "categorie": "Juridisch",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["ongedocumenteerd", "illegaal", "verblijfsstatus", "Pauluskerk"]
+    }
+  },
+  {
+    "vraag": "Ik zie een dakloze op straat, wat kan ik doen?",
+    "antwoord": "Maak contact, vraag of ze eten/drinken nodig hebben. Verwijs naar Pauluskerk (Mauritsweg 20) voor gratis brood/koffie.",
+    "metadata": {
+      "categorie": "Maatschappelijk",
+      "doelgroep": "omgeving",
+      "trefwoorden": ["hulp bieden", "burger", "signalering"]
+    }
+  },
+  {
+    "vraag": "Er is een dakloze die in mijn portiek slaapt, wat kan ik doen?",
+    "antwoord": "Maak contact, vraag of ze iets nodig hebben. Verwijs naar Pauluskerk. Bij overlast: vraag vriendelijk of ze een andere plek zoeken of meld bij politie.",
+    "metadata": {
+      "categorie": "Overlast",
+      "doelgroep": "omgeving",
+      "trefwoorden": ["portiek", "slapen", "overlast", "politie"]
+    }
+  },
+  {
+    "vraag": "Mijn postadres aanvraag is afgewezen.",
+    "antwoord": "Begrijpt u de brief niet? Vraag hulp bij Pauluskerk. Bent u het oneens? Vraag hulp om bezwaar te maken.",
+    "metadata": {
+      "categorie": "Administratie",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["afwijzing", "bezwaar", "postadres"]
+    }
+  },
+  {
+    "vraag": "Ik ben uit de opvang geschorst, waar kan ik slapen?",
+    "antwoord": "Meld je bij Centraal Onthaal voor de wachtlijst. Anders tot 21 uur bij NAS (Vijverhofstraat) voor vervoer naar EU opvang Zestienhoven.",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["schorsing", "noodopvang", "straatverbod"]
+    }
+  },
+  {
+    "vraag": "Het is buiten 0 graden, waar kan ik slapen (Winteropvang)?",
+    "antwoord": "De winteropvang (WCR) opent bij 0 graden. Meld je tot 21 uur bij NAS (Vijverhofstraat 35-37). Je wordt met bus naar Zestienhoven gebracht.",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["winteropvang", "kou", "vorst", "WCR"]
+    }
+  },
+  {
+    "vraag": "Ik kom uit de gevangenis, waar kan ik slapen?",
+    "antwoord": "Ga terug naar gemeente van inschrijving (u heeft reisgeld gehad). Inwoners Rotterdam: meld bij Reclassering en gemeente (Delftseplein 29).",
+    "metadata": {
+      "categorie": "Opvang",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["gevangenis", "detentie", "reclassering", "vrijlating"]
+    }
+  },
+  {
+    "vraag": "Er zitten vaak mensen bij jullie ingang. Kan daar iets aan gedaan worden?",
+    "antwoord": "Als wij gesloten zijn, wachten mensen soms buiten. Wij zijn open van 9:00-21:00. Bij overlast spreken wij bezoekers aan of vragen hen naar een andere plek te gaan.",
+    "metadata": {
+      "categorie": "Overlast",
+      "doelgroep": "omgeving",
+      "trefwoorden": ["ingang", "hangen", "wachten"]
+    }
+  },
+  {
+    "vraag": "Wat doen jullie als iemand agressief is op straat?",
+    "antwoord": "Als het kan, spreken wij ze aan. Bij onveilige situaties bellen we de politie/wijkagent. Vaak helpen bezoekers ook om in te grijpen.",
+    "metadata": {
+      "categorie": "Veiligheid",
+      "doelgroep": "omgeving",
+      "trefwoorden": ["agressie", "veiligheid", "ruzie"]
+    }
+  },
+  {
+    "vraag": "Ik zie regelmatig afval en overlast rond het pand.",
+    "antwoord": "Meld zwerfafval bij de gemeente. U kunt het ook bij ons melden; vaak ruimen wij het samen met bezoekers op.",
+    "metadata": {
+      "categorie": "Overlast",
+      "doelgroep": "omgeving",
+      "trefwoorden": ["afval", "schoonmaak", "zwerfafval"]
+    }
+  }
+]

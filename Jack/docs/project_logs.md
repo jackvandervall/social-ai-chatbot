@@ -35,3 +35,12 @@ De triage agent zal inputs labelen zoals is_emergency, topic, language, reasonin
 - Chainlit getest op de chatbot, UI ziet er goed uit en biedt mogelijkheden tot personalisatie zoals extra buttons voor de gebruikers.
 - README.md geüpdatet op basis van de huidige architecture.
 - Tijdens het gebruik van tools werd de agent door gestructureerde data verward over zijn eigen identiteit, waardoor hij outputs in verkeerde JSON format ging outputten, hierdoor werd de response onjuist gestreamed naar Chainlit.
+
+**11-12-2025**
+VectorDB opgezet en de FAQ embeddings gemaakt met een n8n workflow en openai/text-embedding-3-small, inclusief combined_text en metadata zoals: categorie, doelgroep, trefwoorden, bron_vraag en source_type.
+
+**12-01-2026**
+Begin aan fine-tuning code voor Qwen3-8B, gekozen voor Supervised Fine-Tuning (SFT) met Unsloth framework, vanwege de 2x snellere training dan standaard Hugging Face en 70% minder VRAM-gebruik door kernel-optimalisaties. 
+
+**13-01-2026**
+Verder gewerkt aan de fine-tuning code. Daarnaast als Reinforcement Learning framework, gekozen voor parameter-efficient fine-tuning (PEFT) met LoRA (Low-Rank Adaptation) in plaats van volledige fine-tuning, zodat het mogelijk is om het model te trainen op een consumer hardware zoals een RTX 3060 6GB. Persoonlijk heb ik een GTX 3040 4GB, dus ik kan geen volledige fine-tuning doen of moet overstappen op Qwen2.5-3B-Instruct, ~3.2 GB, goede kwaliteit met multilingual support. Waarschijnlijk ga ik kijken naar een betere LLM die ik kan trainen in een cloud-omgeving zoals Google Colab of van Hogeschool Rotterdam Datalab.

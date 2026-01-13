@@ -17,7 +17,7 @@ class TriageStatus(BaseModel):
         description="Detected primary language: 'nl', 'en', 'pl', 'ar'"
     )
     is_emergency: bool = Field(
-        False,
+        False,       
         description="True ONLY for immediate life-threatening situations (e.g., active bleeding, chest pain, suicide ATTEMPT). False for ideation/discussion."
     )
     reasoning: str = Field(
