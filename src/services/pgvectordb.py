@@ -109,3 +109,42 @@ class VectorDB:
             return []
         finally:
             if conn: await conn.close()
+
+    async def upsert_batch(self, items: List[Dict[str, Any]]):
+        """
+        Inserts or updates a batch of items into the 'knowledge_base' table.
+        Each item should have: content, metadata, source_url, source_type.
+        Embeddings are generated automatically.
+        """
+        conn = None
+        try:
+            conn = await asyncpg.connect(self.db_url, statement_cache_size=0)
+            
+            for item in items:
+                embedding = await self.get_embedding(item['content'])
+                if not embedding:
+                    print(f"[Warning] Skipping item due to embedding failure: {item['content'][:50]}...")
+                    continue
+
+                sql = """
+                    INSERT INTO knowledge_base (content, metadata, source_url, source_type, embedding)
+                    VALUES ($1, $2, $3, $4, $5)
+                    ON CONFLICT (content) DO UPDATE 
+                    SET metadata = EXCLUDED.metadata,
+                        source_url = EXCLUDED.source_url,
+                        source_type = EXCLUDED.source_type,
+                        embedding = EXCLUDED.embedding;
+                """
+                await conn.execute(
+                    sql, 
+                    item['content'], 
+                    json.dumps(item['metadata']), 
+                    item['source_url'], 
+                    item['source_type'], 
+                    str(embedding)
+                )
+            print(f"[Success] Upserted {len(items)} items to knowledge_base.")
+        except Exception as e:
+            print(f"[Error] Batch upsert failed: {e}")
+        finally:
+            if conn: await conn.close()

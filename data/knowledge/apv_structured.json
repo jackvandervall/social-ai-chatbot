@@ -1,0 +1,114 @@
+[
+    {
+        "vraag": "Mag ik mensen om geld vragen (bedelen)?",
+        "antwoord": "Nee. Het is verboden om op straat of in openbare gebouwen te bedelen. De gemeente stelt dit verbod expliciet in om het 'winkelend publiek' te beschermen tegen 'hinderlijk aanspreken'. Jouw noodzaak weegt juridisch minder zwaar dan het comfort van shoppers.",
+        "metadata": {
+            "categorie": "Kleine ergernissen",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "bedelen",
+                "inkomen",
+                "APV 2.65",
+                "boete"
+            ]
+        }
+    },
+    {
+        "vraag": "Mag ik ergens in een portiek of op een trapje hangen?",
+        "antwoord": "Nee. De APV verbiedt 'doelloos rondhangen' in portieken, poorten, wachtruimtes of direct voor gebouwen (zoals op een trap of bordes). Ook al heb je geen huis om naar toe te gaan, de wet labelt jouw aanwezigheid al snel als 'hinderlijk gedrag'.",
+        "metadata": {
+            "categorie": "Overlast en baldadigheid",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "rondhangen",
+                "verblijf",
+                "portieken",
+                "APV 2.49",
+                "APV 2.50"
+            ]
+        }
+    },
+    {
+        "vraag": "Waar kan ik mijn behoefte doen als er geen openbare toiletten zijn?",
+        "antwoord": "Dat is jouw probleem, niet dat van de gemeente. Het is simpelweg verboden om in de openbare ruimte te plassen of poepen op plekken die daar niet voor bedoeld zijn. Dat er vaak geen faciliteiten zijn voor daklozen, is geen geldig excuus volgens artikel 4.8 van de APV.",
+        "metadata": {
+            "categorie": "Kleine ergernissen",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "wildplassen",
+                "wildpoepen",
+                "hygiëne",
+                "APV 4.8"
+            ]
+        }
+    },
+    {
+        "vraag": "Mag ik een biertje drinken op een bankje?",
+        "antwoord": "Vaak niet. De politie grijpt in als alcoholgebruik 'hinder' veroorzaakt, maar het college kan ook hele gebieden aanwijzen waar het simpelweg verboden is. In die gebieden mag je niet eens een aangebroken fles of blikje bij je hebben; die worden afgepakt.",
+        "metadata": {
+            "categorie": "Overlast en baldadigheid",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "alcohol",
+                "drankverbod",
+                "openbare weg",
+                "APV 2.48"
+            ]
+        }
+    },
+    {
+        "vraag": "Wat is dat irritante hoge piepgeluid op sommige plekken?",
+        "antwoord": "Dat is een 'Mosquito'. Een apparaat dat de gemeente inzet om mensen weg te jagen. Ze zeggen dat het gericht is op 'jongeren die overlast veroorzaken', maar het effect is dat niemand daar rustig kan verblijven. Het wordt ingezet als 'zwaar middel' als andere maatregelen niet werken.",
+        "metadata": {
+            "categorie": "Overlast en baldadigheid",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "mosquito",
+                "wegjagen",
+                "geluidsoverlast",
+                "APV 4.6a"
+            ]
+        }
+    },
+    {
+        "vraag": "Mag ik met een paar andere daklozen bij elkaar staan?",
+        "antwoord": "Pas op. Er is een 'samenscholingsverbod'. Als de politie vindt dat jullie groepje een 'dreigende houding' aanneemt of 'kwade bedoelingen' heeft, is het strafbaar. Ook 'onnodig opdringen' valt hieronder.",
+        "metadata": {
+            "categorie": "Ernstige verstoring",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "samenscholing",
+                "groepsvorming",
+                "APV 2.1"
+            ]
+        }
+    },
+    {
+        "vraag": "Mag ik drugs gebruiken op straat?",
+        "antwoord": "Nee. Openlijk drugsgebruik is verboden, net als het weggooien van spuiten. Dit is bedoeld om 'gevoelens van onveiligheid' bij bewoners te voorkomen. De politie kan je wegsturen en je spullen (zoals pijpen of lepels) in beslag nemen.",
+        "metadata": {
+            "categorie": "Kleine ergernissen",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "drugs",
+                "gebruikersruimten",
+                "handhaving",
+                "APV 2.74"
+            ]
+        }
+    },
+    {
+        "vraag": "Mag ik geld verdienen als straatartiest?",
+        "antwoord": "Niet zomaar. Het is verboden op door de burgemeester aangewezen wegen. Tenzij je een ontheffing hebt, wordt ook deze inkomstenbron beperkt onder het mom van openbare orde of 'milieu'.",
+        "metadata": {
+            "categorie": "Overlast en baldadigheid",
+            "doelgroep": "cliënt",
+            "trefwoorden": [
+                "straatartiest",
+                "inkomen",
+                "muziek",
+                "APV 2.9"
+            ]
+        }
+    }
+]
