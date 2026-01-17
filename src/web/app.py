@@ -1,6 +1,7 @@
 import sys
 import os
 import chainlit as cl
+from chainlit.input_widget import Select
 
 # Fix path to import modules from parent directory
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -41,6 +42,16 @@ async def translate_to_english(action: cl.Action):
     translated = await translate_text(action.payload["text"], "English")
     await cl.Message(content=f"**🇬🇧 English:**\n{translated}").send()
 
+@cl.on_settings_update
+async def on_settings_update(settings):
+    """Handle settings updates from the chat UI."""
+    context_mode = settings.get("context_mode", "volunteer")
+    cl.user_session.set("context_mode", context_mode)
+    
+    # Notify user of mode change
+    mode_name = "Volunteer Mode" if context_mode == "volunteer" else "Direct Mode (Homeless Person)"
+    await cl.Message(content=f"✅ Switched to **{mode_name}**").send()
+
 @cl.on_chat_start
 async def start():
     """
@@ -48,11 +59,32 @@ async def start():
     This function is triggered when a new chat session starts. It sends
     an introductory message to the user explaining the bot's purpose.
     """
-    welcome_msg = """
-    **Welkom bij RotterMaatje 2.0** 👋
+    # Initialize context mode in session
+    cl.user_session.set("context_mode", "volunteer")
     
-    Ik ben er om je te helpen met informatie over opvang, medische zorg en procedures.
-    *Typ een vraag om te beginnen.*
+    # Set up chat settings with context mode dropdown
+    settings = await cl.ChatSettings(
+        [
+            Select(
+                id="context_mode",
+                label="Context Mode",
+                values=["volunteer", "direct"],
+                initial_index=0,
+                description="Switch between volunteer and direct communication modes"
+            )
+        ]
+    ).send()
+    
+    welcome_msg = """
+**Welcome to RotterMaatje 2.0** 👋
+
+I'm here to help you with information about shelters, medical care, and procedures in Rotterdam.
+
+**💡 Tip:** Use the ⚙️ settings menu to switch between:
+- **Volunteer Mode**: For volunteers helping homeless individuals
+- **Direct Mode**: Speaks directly to the person in need
+
+*Type a question to get started.*
     """
     await cl.Message(content=welcome_msg).send()
 
@@ -72,9 +104,12 @@ async def main(message: cl.Message):
         message (cl.Message): The incoming message object from the user.
     """
     user_input = message.content
+    
+    # Get context mode from session
+    context_mode = cl.user_session.get("context_mode", "volunteer")
 
     # --- STEP 1: VISUAL TRIAGE ---
-    async with cl.Step(name="Veiligheidscheck", type="tool") as step:
+    async with cl.Step(name="Safety Check", type="tool") as step:
         step.input = user_input
         # Run Triage Agent
         triage_result = await triage_agent.run(user_input)
@@ -91,14 +126,14 @@ async def main(message: cl.Message):
     # --- STEP 2: EMERGENCY BLOCKER ---
     if status.is_emergency:
         emergency_msg = (
-            f"🚨 **NOODGEVAL DETECTIE**\n\n"
+            f"🚨 **EMERGENCY DETECTED**\n\n"
             f"{PromptConfig.get_disclaimer(status.disclaimer_type)}"
         )
         await cl.Message(content=emergency_msg, author="RotterMaatje").send()
         return  # Stop here for emergencies
 
     # --- STEP 3: MAIN AGENT WITH STREAMING ---
-    deps = AgentDeps(db=db, triage_data=status)
+    deps = AgentDeps(db=db, triage_data=status, context_mode=context_mode)
     
     # Create empty message for streaming
     msg = cl.Message(content="")
@@ -126,7 +161,6 @@ async def main(message: cl.Message):
     else:
         final_response = response_text
 
-    # Update message with final content including disclaimer
     # Update message with final content including disclaimer
     msg.content = final_response
     

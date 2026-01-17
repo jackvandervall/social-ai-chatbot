@@ -22,17 +22,25 @@ class AgentDeps(BaseModel):
     
     Attributes:
         db (VectorDB): The vector database instance for RAG operations.
+        triage_data (TriageStatus): Classification data from the triage agent.
+        context_mode (str): Either 'volunteer' or 'direct' for homeless person mode.
     """
     model_config = ConfigDict(arbitrary_types_allowed=True)
     db: VectorDB
     triage_data: Optional[TriageStatus] = None
+    context_mode: str = "volunteer"  # 'volunteer' or 'direct'
 
 # DEFINE THE AGENT
 rottermaatje_agent = Agent(
     model=get_model(),
     deps_type=AgentDeps,
-    system_prompt=PromptConfig.get_system_prompt(),
 )
+
+# Dynamic system prompt based on context mode
+@rottermaatje_agent.system_prompt
+async def get_dynamic_system_prompt(ctx: RunContext[AgentDeps]) -> str:
+    """Returns the appropriate system prompt based on context mode."""
+    return PromptConfig.get_system_prompt(ctx.deps.context_mode)
 
 # RAG tool
 @rottermaatje_agent.tool

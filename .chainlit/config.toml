@@ -86,9 +86,10 @@ reaction_on_message_received = false
 
 [UI]
 # Name of the assistant.
-name = "Assistant"
+name = "RotterMaatje"
 
-# default_theme = "dark"
+# Set default language to English
+default_locale = "en-US"
 
 # layout = "wide"
 
