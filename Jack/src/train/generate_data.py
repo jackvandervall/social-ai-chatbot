@@ -9,14 +9,20 @@ FAQ data with synthetic conversations generated via an LLM.
 import json
 import os
 import random
+from pathlib import Path
 from typing import List, Dict
+from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel
 
-# Initialize Client (Assumes OPENROUTER_API_KEY or OPENAI_API_KEY in environment)
+# Load .env from project root (2 levels up from this file)
+env_path = Path(__file__).resolve().parents[3] / ".env"
+load_dotenv(env_path)
+
+# Initialize Client
 client = OpenAI(
     base_url=os.getenv("OPENAI_BASE_URL", "https://openrouter.ai/api/v1"),
-    api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("OPENAI_API_KEY"))
+    api_key=os.getenv("OPENROUTER_API_KEY")
 )
 
 TOPICS = [
@@ -111,7 +117,7 @@ def generate_dpo_data(count=5):
         """
         
         response = client.chat.completions.create(
-            model="openai/gpt-4o-mini",
+            model="deepseek/deepseek-v3.2",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"}
         )

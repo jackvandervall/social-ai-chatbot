@@ -17,6 +17,6 @@ def get_model():
         OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
         if not OPENROUTER_API_KEY:
             raise ValueError("OPENROUTER_API_KEY not found in environment variables")
-        return 'openrouter:qwen/qwen3-235b-a22b:free'
+        return 'openrouter:x-ai/grok-4.1-fast'
     else:
         raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be 'openrouter' or 'local'")

@@ -24,8 +24,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL and DB_USER and DB_PASSWORD and DB_HOST and DB_NAME:
     DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    # Inject it back into os.environ so other libs can find it if needed
-    os.environ["DATABASE_URL"] = DATABASE_URL
+    # We DO NOT inject it back into os.environ to avoid conflicting with Chainlit's auto-detection
+    # os.environ["DATABASE_URL"] = DATABASE_URL
 
 # --- 3. Synchronous Connection Test (psycopg2) ---
 try:
@@ -64,11 +64,12 @@ class VectorDB:
         """
         Initializes the database connection string and OpenAI client.
         """
-        self.db_url = os.getenv("DATABASE_URL")
+        # Use the module-level DATABASE_URL variable we computed above
+        self.db_url = DATABASE_URL
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
 
         if not self.db_url:
-            raise ValueError("CRITICAL: 'DATABASE_URL' is missing from environment variables.")
+            raise ValueError("CRITICAL: 'DATABASE_URL' is missing from environment variables and could not be constructed.")
         if not self.openai_api_key:
             raise ValueError("CRITICAL: 'OPENAI_API_KEY' is missing from environment variables.")
 

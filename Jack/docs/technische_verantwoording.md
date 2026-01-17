@@ -30,7 +30,7 @@ Combinatie van **echte FAQ-data** en **synthetische data** gegenereerd door een 
 **DeepSeek V3.2** via OpenRouter API.
 
 **Motivatie:**
-- Kostenefficiënt (~$0.14/1M tokens) vergeleken met GPT-4o ($2.50/1M)
+- Kostenefficiënt (~$0.25-0.38/1M tokens) vergeleken met GPT-4o ($5-$15/1M)
 - Uitstekende meertalige capaciteiten (Nederlands, Pools, Arabisch)
 - Native JSON-output ondersteuning
 - Open-weight model, transparant gedrag
