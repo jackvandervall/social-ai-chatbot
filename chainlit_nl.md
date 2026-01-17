@@ -43,10 +43,14 @@ De chatbot detecteert automatisch noodgevallen en gevoelige onderwerpen:
 
 | Dienst | Telefoon | Website |
 |--------|----------|---------|
-| **Noodgevallen** | 112 | - |
+| **Noodgevallen** | 112 | [Politie](https://www.politie.nl) |
 | **Zelfmoordpreventie** | 0900-0113 | [113.nl](https://www.113.nl) |
 | **Huiselijk Geweld** | 0800-2000 | [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) |
+| **Slachtofferhulp** | 0900-0101 | [Slachtofferhulp.nl](https://www.slachtofferhulp.nl) |
 | **Verslavingszorg** | 088-505 1220 | [Jellinek](https://www.jellinek.nl/en/) |
+| **Juridisch Loket** | 0900-8020 | [Juridisch Loket](https://www.juridischloket.nl) |
+| **Straatconsulaat** | 070-3467644 | [Straatconsulaat.nl](https://www.straatconsulaat.nl) |
+| **Gemeente (APV)** | 14 010 | [Rotterdam.nl/apv](https://www.rotterdam.nl/apv) |
 | **Pauluskerk** | 010-411 81 32 | [Pauluskerk](https://www.pauluskerkrotterdam.nl/contact/) |
 
 ---

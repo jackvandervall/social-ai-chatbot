@@ -26,10 +26,14 @@ Type your question in any supported language: Dutch, English, Polish, or Arabic.
 
 | Service | Phone | Website |
 |---------|-------|---------|
-| **Emergency** | 112 | - |
+| **Emergency** | 112 | [Police/Ambulance](https://www.politie.nl) |
 | **Suicide Prevention** | 0900-0113 | [113.nl](https://www.113.nl) |
 | **Domestic Violence** | 0800-2000 | [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) |
+| **Victim Support** | 0900-0101 | [Slachtofferhulp](https://www.slachtofferhulp.nl) |
 | **Jellinek (Addiction)** | 088-505 1220 | [Jellinek](https://www.jellinek.nl/en/) |
+| **Legal Aid** | 0900-8020 | [Juridisch Loket](https://www.juridischloket.nl) |
+| **Advocacy** | 070-3467644 | [Straatconsulaat](https://www.straatconsulaat.nl) |
+| **Rotterdam City (APV)** | 14 010 | [Gemeente Rotterdam](https://www.rotterdam.nl/apv) |
 | **Pauluskerk** | 010-411 81 32 | [Pauluskerk](https://www.pauluskerkrotterdam.nl/contact/) |
 
 ---
@@ -58,10 +62,14 @@ Typ je vraag in een ondersteunde taal: Nederlands, Engels, Pools of Arabisch.
 
 | Dienst | Telefoon | Website |
 |--------|----------|---------|
-| **Noodgevallen** | 112 | - |
+| **Noodgvallen** | 112 | [Politie](https://www.politie.nl) |
 | **Zelfmoordpreventie** | 0900-0113 | [113.nl](https://www.113.nl) |
 | **Huiselijk Geweld** | 0800-2000 | [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) |
+| **Slachtofferhulp** | 0900-0101 | [Slachtofferhulp](https://www.slachtofferhulp.nl) |
 | **Jellinek (Verslaving)** | 088-505 1220 | [Jellinek](https://www.jellinek.nl/en/) |
+| **Juridisch Loket** | 0900-8020 | [Juridisch Loket](https://www.juridischloket.nl) |
+| **Straatconsulaat** | 070-3467644 | [Straatconsulaat](https://www.straatconsulaat.nl) |
+| **Gemeente (APV)** | 14 010 | [Rotterdam.nl](https://www.rotterdam.nl/apv) |
 | **Pauluskerk** | 010-411 81 32 | [Pauluskerk](https://www.pauluskerkrotterdam.nl/contact/) |
 
 ---

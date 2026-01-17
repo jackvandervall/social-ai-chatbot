@@ -97,9 +97,9 @@ Respond ONLY with valid TriageStatus JSON.
     # Disclaimer messages by type - comprehensive coverage for sensitive topics
     DISCLAIMERS = {
         "none": "",
-        "info": "\n\nℹ️ This is not professional advice. Please contact experts for specific guidance.",
-        "caution": "\n\n⚠️ **Sensitive Topic Support:**\n• Suicide/Crisis: 113 Zelfmoordpreventie (0900-0113)\n• Abuse/Violence: [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) (0800-2000)\n• Drugs/Addiction: [Jellinek](https://www.jellinek.nl/en/) (088-505 1220)\n• General Support: [Pauluskerk](https://www.pauluskerkrotterdam.nl/contact/) (010-411 81 32)\n\nYou are not alone. Please reach out for help.",
-        "urgent": "\n\n🚨 **Urgent:** Call emergency services if there is immediate danger.\n• Emergency: 112\n• Crisis Line: 113 (0900-0113)\n• Safe Home: [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) (0800-2000)",
+        "info": "\n\nℹ️ **General Information:**\n• Juridisch advies: [Juridisch Loket](https://www.juridischloket.nl)\n• Belangenbehartiging: [Straatconsulaat](https://www.straatconsulaat.nl)\n• APV/Orde: [Gemeente Rotterdam](https://www.rotterdam.nl/apv)",
+        "caution": "\n\n⚠️ **Sensitive Topic Support:**\n• Suicide/Crisis: 113 Zelfmoordpreventie (0900-0113)\n• Abuse/Violence: [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) (0800-2000) of [Slachtofferhulp](https://www.slachtofferhulp.nl)\n• Drugs/Addiction: [Jellinek](https://www.jellinek.nl/en/) (088-505 1220)\n• General Support: [Pauluskerk](https://www.pauluskerkrotterdam.nl/contact/) (010-411 81 32)\n\nYou are not alone. Please reach out for help.",
+        "urgent": "\n\n🚨 **Urgent:** Call emergency services if there is immediate danger.\n• Emergency: 112\n• Politie (geen spoed): [0900-8844](https://www.politie.nl)\n• Crisis Line: 113 (0900-0113)\n• Safe Home: [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) (0800-2000)",
         "emergency": "🚨 **EMERGENCY:** Call 112 immediately! | Bel 112 nu!\nThis chatbot does not replace professional help."
     }
     

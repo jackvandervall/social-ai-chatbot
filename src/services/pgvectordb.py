@@ -79,6 +79,8 @@ class VectorDB:
                     id, 
                     content, 
                     metadata, 
+                    source_url,
+                    source_type,
                     1 - (embedding <=> $1) as similarity
                 FROM knowledge_base
                 WHERE 1 - (embedding <=> $1) > $3
@@ -97,6 +99,8 @@ class VectorDB:
                     "id": row['id'],
                     "content": row['content'],
                     "metadata": meta,
+                    "source_url": row['source_url'],
+                    "source_type": row['source_type'],
                     "similarity": round(row['similarity'], 4)
                 })
             return results
