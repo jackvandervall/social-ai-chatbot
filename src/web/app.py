@@ -103,7 +103,40 @@ async def main(message: cl.Message):
     Args:
         message (cl.Message): The incoming message object from the user.
     """
-    user_input = message.content
+    # Get initial user input
+    user_input = message.content or ""
+    
+    # --- HANDLE FILE UPLOADS ---
+    # Extract text from uploaded files (e.g., .txt, .md, .json, .csv)
+    file_contents = []
+    MAX_FILE_CHARS = 50000  # Safety limit for total injected text
+    
+    if message.elements:
+        for element in message.elements:
+            # Check for text-based file extensions
+            supported_extensions = (".txt", ".md", ".json", ".csv", ".log")
+            if element.type == "file" and element.name.lower().endswith(supported_extensions):
+                try:
+                    # Chainlit saves uploaded files to a temporary path
+                    with open(element.path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        
+                        # Apply a per-file limit to prevent context window overflow
+                        if len(content) > MAX_FILE_CHARS:
+                            content = content[:MAX_FILE_CHARS] + "\n... [Inhoud ingekort wegens lengte] ..."
+                        
+                        file_contents.append(f"📄 **Bestand: {element.name}**\n---\n{content}\n---")
+                except Exception as e:
+                    file_contents.append(f"⚠️ Fout bij het lezen van {element.name}: {str(e)}")
+    
+    # If files were uploaded, append them to the user input
+    if file_contents:
+        header = "### 📎 GEÜPLOADE DOCUMENTEN\nDe gebruiker heeft documenten bijgevoegd voor context. Gebruik de onderstaande informatie om de vraag te beantwoorden:\n\n"
+        # If the user didn't provide text, give it a default context
+        if not user_input.strip():
+            user_input = "Ik heb documenten geüpload. Zie de bijlagen voor details."
+        
+        user_input += "\n\n" + header + "\n\n".join(file_contents)
     
     # Get context mode from session
     context_mode = cl.user_session.get("context_mode", "volunteer")

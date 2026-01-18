@@ -14,13 +14,13 @@ Currently in **early development**: Terminal mode fully functional, Web UI (Chai
 ## Features
 
 - **Multilingual Support**: Detects and responds in Dutch, English, Polish, Arabic.
-- **RAG Knowledge Base**: Vector search (mocked with pgvector-ready skeleton) for shelters, medical services, procedures.
+- **RAG Knowledge Base**: Vector search for shelters, medical services, procedures, legal information.
 - **AI‑Driven Triage**: Dedicated Pydantic‑AI agent classifies each user input into topic, language, emergency status, and disclaimer level (none/info/caution/urgent). Replaces hardcoded keyword detection with nuanced context‑aware classification.
 - **Safety Guardrails**: Pre‑processing blocks spam/empty input; post‑processing adds appropriate disclaimers based on triage results.
 - **Dual Interfaces**:
   - Terminal mode for quick testing (`src/main.py`).
   - Web UI with Chainlit (`src/web/app.py`).
-- **Flexible LLM Backend**: Local (LMStudio, e.g., Qwen3‑4B) or OpenRouter (DeepSeek V3.2).
+- **Flexible LLM Backend**: Local (LMStudio, e.g., Qwen3‑4B) or OpenRouter (e.g., DeepSeek V3.2).
 - **Pydantic‑AI Agent**: Structured tools/dependencies for reliable execution; main agent receives triage data for context‑aware responses.
 - **Non‑blocking Emergency Handling**: Emergency alerts are shown but the conversation continues, ensuring usability while prioritizing safety.
 
@@ -43,7 +43,7 @@ graph TD
 - **Core**: [Python 3.12+](https://www.python.org/), [`Pydantic‑AI`](src/agent.py) (agents/tools)
 - **LLM**: OpenAI‑compatible (local via LMStudio/Ollama or OpenRouter)
 - **UI**: [Chainlit](https://docs.chainlit.io/)
-- **Database**: pgvector (mocked in [`src/database.py`](src/database.py))
+- **Database**: Supabase (pgvector)
 - **Prompts/Guardrails**: [`src/prompts.py`](src/prompts.py) – now includes triage prompt and disclaimer config
 - **Triage Module**: [`src/triage.py`](src/triage.py) – dedicated classification agent
 - **Dependencies**: Managed via [uv](https://astral.sh/uv) + [`pyproject.toml`](pyproject.toml) (Torch, Transformers, HuggingFace, etc. for potential local models)

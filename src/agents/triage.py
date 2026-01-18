@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from core.llm import get_model
+from core.llm import get_triage_model
 from core.prompts import PromptConfig
 from pydantic_ai import Agent
 
@@ -31,7 +31,7 @@ class TriageStatus(BaseModel):
 
 # Triage agent for classification
 triage_agent = Agent(
-    model=get_model(),
+    model=get_triage_model(),
     output_type=TriageStatus,
     system_prompt=PromptConfig.get_triage_prompt(),
 )

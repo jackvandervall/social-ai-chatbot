@@ -52,9 +52,6 @@ async def main():
             disclaimer = PromptConfig.get_disclaimer(status.disclaimer_type)
             if disclaimer:
                 print(f"Rottermaatje: {disclaimer}\n")
-            # We don't block, but we prepend the disclaimer in the response.
-            # However, we can choose to not run the main agent and just show the emergency message.
-            # For now, we continue to run the main agent but with the disclaimer.
 
         # Prepare dependencies for main agent (including triage data)
         deps = AgentDeps(db=db, triage_data=status)
@@ -62,7 +59,6 @@ async def main():
         # Run main agent
         result = await rottermaatje_agent.run(user_input, deps=deps)
 
-        # Post-process: if emergency, we already have the disclaimer, but we can also add it to the response.
         final_response = result.output
         if status.disclaimer_type != 'none':
             disclaimer = PromptConfig.get_disclaimer(status.disclaimer_type)
