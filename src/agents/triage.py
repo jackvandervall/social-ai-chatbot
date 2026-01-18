@@ -26,7 +26,7 @@ class TriageStatus(BaseModel):
     )
     disclaimer_type: str = Field(
         'none',
-        description="Disclaimer level: 'none', 'info' (general), 'caution' (sensitive e.g. drugs/suicide ideation), 'urgent' (high risk but not immediate)"
+        description="Disclaimer level: 'none', 'info' (legal/rights/bylaws/advocacy), 'caution' (sensitive e.g. drugs/suicide ideation), 'urgent' (high risk/medical urgency)"
     )
 
 # Triage agent for classification

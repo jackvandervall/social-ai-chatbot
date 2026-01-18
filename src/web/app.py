@@ -67,24 +67,24 @@ async def start():
         [
             Select(
                 id="context_mode",
-                label="Context Mode",
+                label="Communicatiemodus",
                 values=["volunteer", "direct"],
                 initial_index=0,
-                description="Switch between volunteer and direct communication modes"
+                description="Schakel tussen vrijwilligers- en directe modus"
             )
         ]
     ).send()
     
     welcome_msg = """
-**Welcome to RotterMaatje 2.0** 👋
+**Welkom bij RotterMaatje 2.0** 👋
 
-I'm here to help you with information about shelters, medical care, and procedures in Rotterdam.
+Ik ben hier om je te helpen met informatie over opvang, medische zorg en procedures in Rotterdam.
 
-**💡 Tip:** Use the ⚙️ settings menu to switch between:
-- **Volunteer Mode**: For volunteers helping homeless individuals
-- **Direct Mode**: Speaks directly to the person in need
+**💡 Tip:** Gebruik het ⚙️ instellingenmenu om te schakelen tussen:
+- **Vrijwilligersmodus**: Voor vrijwilligers die daklozen helpen.
+- **Directe modus**: Spreekt direct tegen de persoon in nood.
 
-*Type a question to get started.*
+*Typ een vraag om te beginnen.*
     """
     await cl.Message(content=welcome_msg).send()
 
@@ -109,18 +109,32 @@ async def main(message: cl.Message):
     context_mode = cl.user_session.get("context_mode", "volunteer")
 
     # --- STEP 1: VISUAL TRIAGE ---
-    async with cl.Step(name="Safety Check", type="tool") as step:
-        step.input = user_input
+    async with cl.Step(name="Veiligheidscontrole") as step:
         # Run Triage Agent
         triage_result = await triage_agent.run(user_input)
         status: TriageStatus = triage_result.output
         
-        # Update the UI step with the reasoning
+        # Map topics to readable Dutch categories with icons
+        topic_map = {
+            "shelter": "🛌 Slapen / Opvang",
+            "medical": "🏥 Medische hulp / Zorg",
+            "food": "🍴 Eten & Drinken",
+            "legal": "📄 Juridisch / Documenten",
+            "social": "🤝 Sociaal / Welzijn",
+            "other": "❓ Overig"
+        }
+        category = topic_map.get(status.topic, f"❓ {status.topic}")
+
+        # Map languages to names
+        lang_map = {"nl": "Nederlands", "en": "Engels", "pl": "Pools", "ar": "Arabisch"}
+        language = lang_map.get(status.language, status.language.upper())
+
+        # Update the UI step with formatted output
         step.output = (
-            f"Topic: {status.topic} | "
-            f"Language: {status.language} | "
-            f"Emergency: {status.is_emergency}\n"
-            f"Reasoning: {status.reasoning}"
+            f"**Categorie:** {category}\n"
+            f"**Taal:** {language}\n"
+            f"**Spoed:** {'🚨 JA' if status.is_emergency else '✅ Geen spoed'}\n\n"
+            f"**Analyse:** {status.reasoning}"
         )
 
     # --- STEP 2: EMERGENCY BLOCKER ---
@@ -137,21 +151,30 @@ async def main(message: cl.Message):
     
     # Create empty message for streaming
     msg = cl.Message(content="")
-    await msg.send()
-
-    # Stream the response
-    response_text = ""
-    async with rottermaatje_agent.run_stream(user_input, deps=deps) as result:
-        async for chunk in result.stream_text(delta=True):
-            response_text += chunk
-            await msg.stream_token(chunk)
-        
-        # Handle silent tool returns
-        if not response_text:
-            final_data = await result.get_output()
-            if final_data:
-                response_text = str(final_data)
-                await msg.stream_token(response_text)
+    
+    # Use a step to show "thinking" until we get the first chunk
+    async with cl.Step(name="Hulpbronnen raadplegen...") as thinking_step:
+        # Stream the response
+        response_text = ""
+        async with rottermaatje_agent.run_stream(user_input, deps=deps) as result:
+            # We want to close the thinking step as soon as we start getting content
+            first_chunk = True
+            async for chunk in result.stream_text(delta=True):
+                if first_chunk:
+                    thinking_step.output = "Antwoord verzonden."
+                    await msg.send()
+                    first_chunk = False
+                
+                response_text += chunk
+                await msg.stream_token(chunk)
+            
+            # Handle silent tool returns (if no text was streamed)
+            if not response_text:
+                final_data = await result.get_output()
+                if final_data:
+                    response_text = str(final_data)
+                    await msg.send()
+                    await msg.stream_token(response_text)
 
     # --- STEP 4: ADD DISCLAIMER AFTER RESPONSE ---
     if status.disclaimer_type != 'none':

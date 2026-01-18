@@ -86,7 +86,7 @@ Classify the user input STRICTLY into TriageStatus JSON:
 - language: Primary detected: 'nl' (Dutch), 'en' (English), 'pl' (Polish), 'ar' (Arabic)
 - is_emergency: true ONLY for IMMEDIATE life-threat (active bleeding, chest pain NOW, suicide ATTEMPT in progress). False for discussion/ideation/planning.
 - reasoning: 1-2 sentences explaining choices.
-- disclaimer_type: 'none' (normal), 'info' (medical/legal general), 'caution' (sensitive: drugs/suicide ideation/abuse), 'urgent' (high risk, imminent harm but not immediate death)
+- disclaimer_type: 'none' (normal), 'info' (legal/rights/bylaws/advocacy), 'caution' (sensitive: drugs/suicide ideation/abuse), 'urgent' (high risk/medical urgency)
 
 Context: Rotterdam homeless services (Pauluskerk, shelters, Straatdokter, Leger des Heils). Be context-aware: "suicide thoughts" = caution (not emergency), "bleeding badly now" = emergency.
 

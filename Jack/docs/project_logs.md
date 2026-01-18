@@ -46,3 +46,32 @@ Begin aan fine-tuning code voor Qwen3-8B, gekozen voor Supervised Fine-Tuning (S
 Verder gewerkt aan de fine-tuning code, ik heb gekozen voor parameter-efficient fine-tuning (PEFT) met LoRA (Low-Rank Adaptation) in plaats van volledige fine-tuning, zodat het mogelijk is om het model te trainen op een consumer hardware zoals een RTX 3060 6GB. Persoonlijk heb ik een GTX 3040 4GB, dus ik kan geen volledige fine-tuning doen of moet overstappen op Qwen2.5-3B-Instruct, ~3.2 GB, goede kwaliteit met multilingual support. Waarschijnlijk ga ik kijken naar een betere LLM die ik kan trainen in een cloud-omgeving zoals Google Colab of van Hogeschool Rotterdam Datalab.
 
 Voor de Reinforcement Learning (RL) heb ik gekozen voor Direct Preference Optimization (DPO), omdat het stabieler en efficiënter is dan traditionele RLHF, directe optimalisatie van gebruikersvoorkeuren mogelijk maakt zonder complex reward model, en naadloos integreert met Unsloth voor snelle training op hardware met beperkt VRAM.
+
+**17-01-2026**
+Aanpassingen gedaan aan de agent, namelijk een vertalingsfunctie op het advies van de chatbot, zodat de vrijwilligers de adviezen in de taal van de dakloze kunnen laten lezen. Daarnaast een gebruikersinstructie in de 'Leesmij' knop op de frontend. De system prompts zijn nu dynamisch en worden aangepast op basis van de type gebruiker, 'volunteer' of 'direct'.
+
+Voor veiligheidsredenen heb ik guardrails gemaakt zodat de chatbot nooit naar een volledige naam, BSN, of gevoelige persoonsgegevens zal vragen. Daarnaast zijn er overige instanties bijgevoegd aan de safety disclaimers van de triage agent, inclusief links naar de instanties voor real-time verificatie. 
+
+Tot slot heb ik relevante gegevens uit de Algemeen Plaatselijke Verordening (APV) van de gemeente Rotterdam, gehaald en in de vector database toegevoegd. Hier staan regels over openbare orde en veiligheid, verkeerszaken en horeca-aangelegenheden. Hier is een algemene script voor gemaakt zodat ik van meerdere bronnen soortgelijke informatie kan importeren en in de vector database toevoegen. 
+
+Hoe ik de data structureer voor de vector database, is door de html code te parseren door een LLM (Google Gemini Pro 3), met de volgende prompt:
+
+```text
+Extract alle informatie die toepasselijk is op dak- en thuisloze personen.
+
+Verander het daarna in een vraag en antwoord format:
+
+[
+  {
+    "vraag": "Waarom word ik aangesproken als ik met een groepje op straat sta?",
+    "antwoord": "Dit valt onder 'Openbare Ordeverstoring' (Woonoverlast & Straatoverlast). De politie grijpt in bij gedrag dat de rust verstoort, zoals groepsvorming, schreeuwen of ingangen blokkeren. Meldingen hiervan zijn de laatste jaren verdubbeld.",
+    "metadata": {
+      "categorie": "Openbare Orde",
+      "doelgroep": "cliënt",
+      "trefwoorden": ["overlast", "groepsvorming", "APV", "politiecontact"]
+    }
+  }
+]
+```
+
+Met deze data kan de chatbot door middel van de pgvector tool gemakkelijk de juiste informatie vinden, door de implementatie van een vector database is dit erg schaalbaar.

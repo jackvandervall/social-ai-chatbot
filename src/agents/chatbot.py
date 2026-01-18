@@ -7,6 +7,7 @@ from agents.triage import TriageStatus
 from pydantic_ai.models.openai import OpenAIChatModel
 from services.pgvectordb import VectorDB
 from core.prompts import PromptConfig
+import chainlit as cl
 from core.llm import get_model
 
 # Load environment variables
@@ -58,11 +59,12 @@ async def search_knowledge_base(ctx: RunContext[AgentDeps], query: str) -> str:
     Returns:
         str: A formatted string of search results or a default message if none found.
     """
-    results = await ctx.deps.db.search(query)
-    if not results:
-        return "Geen specifieke informatie gevonden in de database."
-    contents = [r["content"] for r in results]
-    return "- " + "\n- ".join(contents)
+    async with cl.Step(name="Interne kennisbank", type="tool"):
+        results = await ctx.deps.db.search(query)
+        if not results:
+            return "Geen specifieke informatie gevonden in de database."
+        contents = [r["content"] for r in results]
+        return "- " + "\n- ".join(contents)
 
 # Classification tool
 @rottermaatje_agent.tool
@@ -71,7 +73,8 @@ async def get_triage_info(ctx: RunContext[AgentDeps]) -> str:
     Get the triage classification for the current user input.
     Always call this first to understand topic, language, emergency status, and sensitivity.
     """
-    if ctx.deps.triage_data:
-        td = ctx.deps.triage_data
-        return f"Triage: Topic='{td.topic}', Language='{td.language}', Emergency={td.is_emergency}, Disclaimer='{td.disclaimer_type}'. Reason: {td.reasoning}"
-    return "No triage data."
+    async with cl.Step(name="Triage-analyse", type="tool"):
+        if ctx.deps.triage_data:
+            td = ctx.deps.triage_data
+            return f"Triage: Topic='{td.topic}', Language='{td.language}', Emergency={td.is_emergency}, Disclaimer='{td.disclaimer_type}'. Reason: {td.reasoning}"
+        return "No triage data."
