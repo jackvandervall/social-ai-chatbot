@@ -23,17 +23,17 @@ Combinatie van **echte FAQ-data** en **synthetische data** gegenereerd door een 
 | Databron | Formaat | Taal | Voorbeelden |
 |----------|---------|------|-------------|
 | `faq_structured.json` | Q&A paren | Nederlands | 24 |
-| Synthetische SFT | Multi-turn conversaties | NL/EN/PL/AR | 10 |
-| DPO Preference Pairs | Prompt + Chosen + Rejected | NL/EN/PL/AR | 20 |
+| `apv_structured.json` | Q&A paren | Nederlands | 8 |
+| Synthetische SFT | Multi-turn conversaties | NL/EN/PL/AR | 50 (rewritten) |
+| DPO Preference Pairs | Prompt + Chosen + Rejected | NL/EN/PL/AR | 50 |
 
 ### Teacher-Model voor Synthese
-**DeepSeek V3.2** via OpenRouter API.
+**Deepseek V3.2** (via OpenRouter) of **Grok-4.1-fast**.
 
 **Motivatie:**
-- Kostenefficiënt (~$0.25-0.38/1M tokens) vergeleken met GPT-4o ($5-$15/1M)
-- Uitstekende meertalige capaciteiten (Nederlands, Pools, Arabisch)
-- Native JSON-output ondersteuning
-- Open-weight model, transparant gedrag
+- **Deepseek V3.2:** Gebruikt voor grootschalige data-generatie vanwege lage kosten en meertalige kracht.
+- **Grok-4.1-fast:** Gebruikt in de testfase voor snelle validatie van prompts en agentic tool-calling gedrag.
+- **Privacy Guardrail:** Synthetische data bevat GEEN echte persoonsgegevens van cliënten (GDPR/AVG compliant).
 
 ### DPO Negatieve Voorbeelden
 De "rejected" antwoorden bevatten bewust fouten:
@@ -63,12 +63,12 @@ De "rejected" antwoorden bevatten bewust fouten:
 | `r` (rank) | 16 | Balans tussen capaciteit en VRAM |
 | `lora_alpha` | 16 | Scaling factor |
 | `target_modules` | q/k/v/o_proj, gate/up/down_proj | Alle attention + MLP lagen |
-| `load_in_4bit` | True | QLoRA voor 6GB GPU |
+| `load_in_4bit` | True | QLoRA voor 4GB GPU (RTX 3050) |
 
 **Motivatie:**
 - Slechts ~0.1% van parameters getraind
 - Voorkomt catastrophic forgetting van basiskennis
-- Mogelijk op consumer hardware (RTX 3060 6GB)
+- Cruciaal voor hardware met **4GB VRAM** (RTX 3050)
 
 ### Trainingsparameters
 
@@ -112,24 +112,28 @@ Waarbij `y_w` = chosen, `y_l` = rejected, `β` = 0.1 (KL-penalty)
 
 ---
 
-## 4. Modelkeuze
+## 4. Modelkeuze & Architectuur
 
-### Basismodel
-**Qwen3-8B-Instruct** (4-bit quantized via Unsloth)
+### Lokale Fine-Tune: qwen3-4b-2507 (GGUF)
+Gekozen voor de **4B variant** in plaats van 8B vanwege de hardware restrictie (**RTX 3050 4GB VRAM**).
 
-**Motivatie:**
-| Criterium | Qwen3-8B | Llama 3-8B | Mistral 7B |
-|-----------|----------|------------|------------|
-| Meertalig (NL/PL/AR) | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ |
-| Instructie-volgen | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| VRAM (4-bit) | 6GB | 6GB | 5GB |
-| Unsloth support | ✅ | ✅ | ✅ |
-| Licentie | Apache 2.0 | Llama 3 License | Apache 2.0 |
+| Criterium | Qwen3-4B | Llama 3.2-3B | Gemma 3-4B |
+|-----------|----------|--------------|------------|
+| VRAM Vulling | ⭐⭐⭐ (Volledig in VRAM) | ⭐⭐⭐ | ⭐⭐ (Krap) |
+| Meertalig | ⭐⭐⭐ | ⭐ | ⭐⭐ |
+| Redeneren | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ |
 
-Qwen3 scoort het beste op **niet-Engelse talen**, specifiek relevant voor onze Pools- en Arabisch-sprekende doelgroep.
+### Productie Gatekeeper: Safeguard-20b
+Voor de **triage-fase** wordt een groter, extern model gebruikt: **gpt-oss-safeguard-20b**.
+- **Doel:** Filteren van onveilige input, detectie van crisis/spoedgevallen.
+- **Transparantie:** Volledige *chain-of-thought* voor auditbaarheid.
+
+### Productie Agent: Grok-4.1-fast
+Voor de **interactie met tools** (VectorDB, agenda, services) wordt **Grok-4.1-fast** gebruikt.
+- **Reden:** Extreem lage latency en superieure tool-calling prestaties voor complexe agentic workflows.
 
 ### Deployment Formaat
-**GGUF Q4_K_M** voor lokale inference via LMStudio.
+**GGUF Q4_K_M** voor de lokale 4B-component via LMStudio/Ollama.
 
 ---
 
@@ -138,22 +142,20 @@ Qwen3 scoort het beste op **niet-Engelse talen**, specifiek relevant voor onze P
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    DATA GENERATIE                       │
-│  DeepSeek V3 → OpenRouter API → JSONL (SFT + DPO)      │
+│  Deepseek V3.2.2 → JSONL (50 SFT + 50 DPO)                  │
+│  *Softened persona via core/prompts.py*                 │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│                    FINE-TUNING                          │
-│  Qwen3-8B + Unsloth + LoRA + TRL SFTTrainer            │
+│                    FINE-TUNING (LOCAL)                  │
+│  Qwen3-4B + Unsloth + LoRA (RTX 3050 Optimized)         │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│                    ALIGNMENT                            │
-│  TRL DPOTrainer + Preference Data                       │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│                    DEPLOYMENT                           │
-│  GGUF Q4_K_M → LMStudio / Ollama                        │
+│                    HYBRIDE ARCHITECTUUR                 │
+│ 1. Safeguard-20b (Triage)                               │
+│ 2. Grok-4.1-fast (Tool Orchestrator)                    │
+│ 3. Qwen3-4B (Local Persona & Logic)                     │
 └─────────────────────────────────────────────────────────┘
 ```
 

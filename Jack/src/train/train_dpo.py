@@ -19,8 +19,8 @@ PatchDPOTrainer()
 # Typically we would load the LoRA weights from the SFT stage first,
 # but for this script we show how to do DPO on a base or SFT-aligned model.
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "unsloth/Qwen3-8B-bnb-4bit", # Or your SFT checkpoint "outputs/checkpoint-X"
-    max_seq_length = 1024,
+    model_name = "Qwen/Qwen3-4B-Instruct-2507", # Or your SFT checkpoint "outputs/checkpoint-X"
+    max_seq_length = 2048,
     load_in_4bit = True,
 )
 

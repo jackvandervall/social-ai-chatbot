@@ -14,3 +14,11 @@ wheels/
 
 # Files
 .files/
+
+# Models
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt

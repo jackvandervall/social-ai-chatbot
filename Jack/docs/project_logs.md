@@ -151,3 +151,29 @@ De interactie sluit af met een overzicht van noodnummers en gespecialiseerde ins
 * **Stapsgewijze Hulp:** In plaats van een muur van tekst, krijgt de gebruiker een duidelijk pad: eerst medische stabilisatie, dan opvang.
 
 De effecitivteit is bewezen als zeer gewenst, door gebruik te maken van gpt-oss-safeguard-20b voor triage en x-ai/grok-4.1-fast voor de chatbot en toolcalls. x-ai/grok-4.1-fast vanwege de snelheid voor iteratief experimenteren en aantrekkelijke API-kosten. De locaties van de instanties zijn afkomstig uit de interne kennisbank, onder andere de faq geleverd door de Pauluskerk, dit is door de chatbot zelf geverifieerde data, door middel van vectordb queries. De chatbot stopt niet alleen bij het leveren van informatie, maar vraagt ook door voor extra informatie, zoals de inschrijfregio van de cliënt, overige zorgbehoeften en andere medische problemen. De chatbot kwam wellicht te kort bij de hoeveelheid informatie die is gegeven, het heeft bijvoorbeeld niet de financiële informatie aangekaart (premie-achterstand), maar hier is in de kennisbank ook weinig data over te vinden. Geen sturing voor de aanvraag voor Wajong of Bijstandsuitkering. (Bron: Jack\data\intake_formulier_casus.txt)
+
+**19-01-2026**
+Vandaag heb ik data gegenereerd om het qwen3-4b-instruct model te fine-tunen. Om de data te generenen heb ik Deepseek V3.2 gebruikt voor data-generatie vanwege lage kosten en meertalige kracht. De data is gegenereerd op basis van reële interacties en topics vanuit de data in de interne kennisbank. Daarnaast is ook GPO reinforcement learning toegepast, waardoor de LLM ook leert om een foutieve toon en incorrecte data te vermijden. Zelfs met quentization kon ik het niet lokaal trainen, vanwege deze error:
+
+>"ValueError: Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model."
+
+Vandaar dat ik het via Google Colab heb gedaan. Hieronder de resultaten:
+
+🧪 Testing fine-tuned model:
+
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+
+📝 User: Ik ben dakloos en heb honger. Waar kan ik eten krijgen?...
+🤖 RotterMaatje: Ik begrijp dat het moeilijk is als je net uit de gevangenis komt. Er zijn plaatsen in Rotterdam waar je kunt eten. Bij de Pauluskerk op Delftseplein 25, de Wassel-De Vries op 's Gravendijkwal 49 en de...
+------------------------------------------------------------
+📝 User: I see a homeless person on the street. What can I do to help...
+🤖 RotterMaatje: Thank you for asking. Helping homeless individuals is important. You can support them by volunteering at Pauluskerk, donating to their cause, or reporting their presence to the municipality. If you ne...
+------------------------------------------------------------
+📝 User: أين يمكنني العثور على مأوى ليلي في روتردام؟...
+🤖 RotterMaatje: مرحبًا! نعم، يمكنني مساعدتك. مأوى NAS المخصص للبالغين موجود في فيجرهافسترات 29-31 في روتردام. هل الشخص الذي تساعده من منطقة روتردام؟ هذا مهم لتأكيد إمكانية الوصول إلى المأوى....
+------------------------------------------------------------
+📝 User: Gdzie mogę znaleźć nocleg w Rotterdamie?...
+🤖 RotterMaatje: Cześć! W Rotterdamie dostępne są różne pokoje noclegowe dla tych, którzy potrzebują mieszkania. Czy jesteś z regionu Rotterdamu lub zarejestrowałeś się w regionie ostatnio? To ważne dla dostępu do nie...
+------------------------------------------------------------
+
+Zoals te zien is uit de test output, geeft het model op empathische manier antwoord. Er is alleen een merkwaardig antwoord gegenereerd, waarin de LLM ervan uit lijkt te gaan dat de user uit de gevangenis komt, in tegenstelling tot de initiële prompt, waarbij de user dakloos is en honger heeft. Dit kan komen door de data die is gebruikt voor het fine-tunen, waarbij er ook data is gebruikt over mensen die uit de gevangenis komen, mogelijke overtraining heeft voor deze hallucinatie gezorgt. Het is belangrijk om diverse data te hebben voor het fine-tunen om deze bias te voorkomen.

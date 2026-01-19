@@ -3,34 +3,53 @@ Script for generating synthetic training data for the RotterMaatje chatbot.
 
 This module handles the generation of both Supervised Fine-Tuning (SFT) 
 and Direct Preference Optimization (DPO) datasets by combining real 
-FAQ data with synthetic conversations generated via an LLM.
+FAQ/APV data with synthetic conversations generated via an LLM.
 """
 
 import json
 import os
 import random
+import time
+import sys
 from pathlib import Path
 from typing import List, Dict
 from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel
 
-# Load .env from project root (2 levels up from this file)
-env_path = Path(__file__).resolve().parents[3] / ".env"
-load_dotenv(env_path)
+# --- PATH CONFIGURATION ---
+ROOT_DIR = Path(__file__).resolve().parents[3]
+DATA_KNOWLEDGE_DIR = ROOT_DIR / "data" / "knowledge"
+OUTPUT_DIR = ROOT_DIR / "Jack" / "data"
 
-# Initialize Client
+# Add project root to sys.path to import src modules
+sys.path.append(str(ROOT_DIR))
+
+try:
+    from src.core.prompts import PromptConfig
+    SYSTEM_PROMPT = PromptConfig.get_system_prompt()
+except ImportError:
+    # Fallback if import fails (e.g. structure issues), though sys.path should fix it
+    print("Warning: Could not import PromptConfig. Using fallback prompt.")
+    SYSTEM_PROMPT = """You are RotterMaatje, a helpful, empathetic assistant for volunteers helping the homeless in Rotterdam.
+    Communicate in the user's language at B1 level. Be culturally sensitive.
+    Prioritize safety and provide accurate information."""
+
+# Load .env
+load_dotenv(ROOT_DIR / ".env")
+
+# --- LLM CONFIGURATION ---
+provider = os.getenv("MODEL_PROVIDER", "openrouter").lower()
+api_key = os.getenv("OPENROUTER_API_KEY") if provider == "openrouter" else os.getenv("OPENAI_API_KEY")
+base_url = "https://openrouter.ai/api/v1" if provider == "openrouter" else os.getenv("OPENAI_BASE_URL")
+
+# Use a confirmed OpenRouter model (DeepSeek V3 is very capable and cheap)
+MODEL_NAME = "deepseek/deepseek-chat" 
+
 client = OpenAI(
-    base_url=os.getenv("OPENAI_BASE_URL", "https://openrouter.ai/api/v1"),
-    api_key=os.getenv("OPENROUTER_API_KEY")
+    base_url=base_url,
+    api_key=api_key
 )
-
-TOPICS = [
-    {"topic": "Emergency Shelter", "facts": "Nachtopvang is available at Pauluskerk (Schiekade 3) and Centraal Onthaal. Emergency contact: 112."},
-    {"topic": "Medical Care", "facts": "Street doctor (Straatdokter) is available on Tuesdays at Pauluskerk. Basic first aid provided by volunteers."},
-    {"topic": "Food & Meals", "facts": "Free soup and bread served daily at 12:00 at Pauluskerk. No ID required for first-time visitors."},
-    {"topic": "Legal Aid", "facts": "Legal advice (Rechtshulp) for undocumented people is available on Thursdays at the church office."},
-]
 
 LANGUAGES = [
     {"name": "Dutch", "code": "nl"},
@@ -39,219 +58,171 @@ LANGUAGES = [
     {"name": "Arabic", "code": "ar"},
 ]
 
-class SFTExample(BaseModel):
-    messages: List[Dict[str, str]]
-
-class DPOExample(BaseModel):
-    prompt: str
-    chosen: str
-    rejected: str
-
-def generate_sft_data(count=5):
+def load_unified_knowledge() -> List[Dict]:
     """
-    Generates multi-turn conversations for Supervised Fine-Tuning (SFT).
-
-    Args:
-        count (int): The number of synthetic conversations to generate.
+    Loads FAQ and APV data from the knowledge directory.
     """
-    print(f"Generating {count} SFT examples...")
+    all_knowledge = []
+    
+    files = ["faq_structured.json", "apv_structured.json"]
+    for filename in files:
+        file_path = DATA_KNOWLEDGE_DIR / filename
+        if file_path.exists():
+            print(f"Loading knowledge from {filename}...")
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                all_knowledge.extend(data)
+        else:
+            print(f"Warning: {file_path} not found.")
+            
+    return all_knowledge
+
+def generate_sft_data(knowledge_base: List[Dict], count=10):
+    """
+    Generates multi-turn conversations grounded in real knowledge.
+    """
+    print(f"Generating {count} synthetic SFT examples...")
     examples = []
     
-    for _ in range(count):
-        topic = random.choice(TOPICS)
+    for i in range(count):
+        item = random.choice(knowledge_base)
         lang = random.choice(LANGUAGES)
         
-        prompt = f"""Generate a realistic chatbot conversation for a social service bot called 'RotterMaatje'.
-        The bot helps homeless people in Rotterdam.
+        prompt = f"""Generate a realistic chatbot conversation for 'RotterMaatje'.
         
-        Language: {lang['name']}
-        Topic: {topic['topic']}
-        Key Facts to include: {topic['facts']}
+        SYSTEM PERSONA (The 'assistant' MUST follow this):
+        {SYSTEM_PROMPT}
         
-        Format the output as a JSON list of messages with 'role' (user/assistant) and 'content'.
-        Provide 2-3 turns (user-assistant-user-assistant).
-        The bot should be helpful, empathetic, and professional.
+        CONTEXT DATA (Raw facts - REPHRASE these to match the persona's tone):
+        Question: {item['vraag']}
+        Answer: {item['antwoord']}
+        Category: {item.get('metadata', {}).get('categorie', 'General')}
+        
+        Target Language: {lang['name']}
+        
+        Instructions:
+        1. Create a conversation where a user asks about the context topic in the Target Language.
+        2. The assistant responds using the SYSTEM PERSONA.
+        3. STRICTLY AVOID copying the raw Answer if it is rude, bureaucratic, or harsh (e.g. APV legal text). Adapt it to be helpful and empathetic.
+        4. Provide 2-3 turns.
+        
+        Format the output as a JSON object with a 'messages' key containing a list of roles (user/assistant) and 'content'.
         """
         
-        response = client.chat.completions.create(
-            model="deepseek/deepseek-v3.2",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
-        )
-        
-        content = json.loads(response.choices[0].message.content)
-        # Handle different potential JSON keys from LLM
-        messages = content.get("messages", content.get("conversation", []))
-        if messages:
-            examples.append({"messages": messages})
+        try:
+            print(f"  [{i+1}/{count}] Requesting SFT example for topic: {item['vraag'][:30]}...")
+            response = client.chat.completions.create(
+                model=MODEL_NAME,
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"}
+            )
             
-    with open("Jack/data/synthetic_train.jsonl", "w", encoding="utf-8") as f:
-        for ex in examples:
-            f.write(json.dumps(ex, ensure_ascii=False) + "\n")
-    print("SFT data saved to Jack/data/synthetic_train.jsonl")
-
-def generate_dpo_data(count=5):
-    """
-    Generates preference pairs for Reinforcement Learning (DPO).
-
-    Args:
-        count (int): The number of synthetic DPO triplets to generate.
-    """
-    print(f"Generating {count} DPO examples...")
-    examples = []
-    
-    for _ in range(count):
-        topic = random.choice(TOPICS)
-        lang = random.choice(LANGUAGES)
-        
-        prompt = f"""Generate a DPO (Direct Preference Optimization) triplet for the 'RotterMaatje' bot.
-        
-        Language: {lang['name']}
-        Topic: {topic['topic']}
-        Fact: {topic['facts']}
-        
-        Return a JSON object with:
-        - 'prompt': A user question in {lang['name']}.
-        - 'chosen': A perfect, empathetic, factually correct answer in {lang['name']}.
-        - 'rejected': A bad answer (e.g., wrong language, hallucinated location, rude tone, or forgetting the church address).
-        """
-        
-        response = client.chat.completions.create(
-            model="deepseek/deepseek-v3.2",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
-        )
-        
-        examples.append(json.loads(response.choices[0].message.content))
+            content = json.loads(response.choices[0].message.content)
+            messages = content.get("messages", [])
+            if messages:
+                examples.append({"messages": messages})
+                print(f"  Done.")
+            time.sleep(1) # Simple rate limiting safeguard
+        except Exception as e:
+            print(f"Error generating SFT: {e}")
             
-    with open("Jack/data/synthetic_dpo.jsonl", "w", encoding="utf-8") as f:
-        for ex in examples:
-            f.write(json.dumps(ex, ensure_ascii=False) + "\n")
-    print("DPO data saved to Jack/data/synthetic_dpo.jsonl")
-
-def load_real_faq_data():
-    """
-    Loads real FAQ data from JSON and converts it to SFT format.
-
-    Returns:
-        list[dict]: A list of conversation dictionaries formatted for SFT.
-    """
-    print("Loading real FAQ data...")
-    examples = []
-    
-    faq_path = "Jack/data/faq_structured.json"
-    if not os.path.exists(faq_path):
-        print(f"Warning: {faq_path} not found. Skipping real data.")
-        return examples
-    
-    with open(faq_path, "r", encoding="utf-8") as f:
-        faq_data = json.load(f)
-    
-    for item in faq_data:
-        # Convert Dutch FAQ to chat format
-        messages = [
-            {"role": "user", "content": item["vraag"]},
-            {"role": "assistant", "content": item["antwoord"]}
-        ]
-        examples.append({"messages": messages})
-    
-    print(f"Loaded {len(examples)} real FAQ examples.")
     return examples
 
-
-def generate_dpo_from_faq(count=10):
+def generate_dpo_from_knowledge(knowledge_base: List[Dict], count=15):
     """
-    Generates DPO pairs using real FAQ data as grounding for accuracy.
-
-    Args:
-        count (int): The number of DPO triplets to generate from FAQ items.
-
-    Returns:
-        list[dict]: A list of DPO triplets (prompt, chosen, rejected).
+    Generates DPO pairs using real knowledge as grounding for accuracy.
     """
-    print(f"Generating {count} DPO examples from real FAQ...")
+    print(f"Generating {count} DPO examples from knowledge base...")
     examples = []
     
-    faq_path = "Jack/data/faq_structured.json"
-    if not os.path.exists(faq_path):
-        print(f"Warning: {faq_path} not found. Using generic topics instead.")
-        return []
+    if count > len(knowledge_base):
+        sampled = random.choices(knowledge_base, k=count)
+    else:
+        sampled = random.sample(knowledge_base, count)
     
-    with open(faq_path, "r", encoding="utf-8") as f:
-        faq_data = json.load(f)
-    
-    # Sample FAQ items for DPO
-    sampled = random.sample(faq_data, min(count, len(faq_data)))
-    
-    for item in sampled:
+    for i, item in enumerate(sampled):
         lang = random.choice(LANGUAGES)
         
-        prompt = f"""Generate a DPO triplet for training a social service chatbot.
+        prompt = f"""Generate a DPO (Direct Preference Optimization) triplet for 'RotterMaatje'.
 
-        REAL FAQ (Dutch):
+        SYSTEM PERSONA (Defines the 'chosen' response style):
+        {SYSTEM_PROMPT}
+
+        KNOWLEDGE SOURCE (Raw Information):
         Question: {item['vraag']}
         Correct Answer: {item['antwoord']}
-        Category: {item['metadata']['categorie']}
 
         Target Language: {lang['name']}
         
-        Return a JSON object with:
-        - 'prompt': The user question translated to {lang['name']}.
-        - 'chosen': The correct answer translated to {lang['name']}, maintaining all specific addresses and details.
-        - 'rejected': A BAD answer that makes one of these mistakes:
-          1. Wrong address (e.g., swapping Pauluskerk for NAS location)
-          2. Wrong language (e.g., replying in Dutch when asked in Polish)
-          3. Rude or dismissive tone
-          4. Hallucinated information not in the original answer
+        Instructions:
+        1. 'prompt': A realistic user question in {lang['name']}.
+        2. 'chosen': The PERFECT response in {lang['name']}. It MUST:
+           - Use the System Persona (empathetic, helpful, B1 level).
+           - Use the Knowledge Source facts but REPHRASE them to be kind. NEVER be rude or bureaucratic.
+           - If the raw answer is harsh (e.g. "It's illegal, deal with it"), soften it: "Unfortunately, it is not allowed..."
+        3. 'rejected': A BAD response. It should be:
+           - Rude, dismissive, or overly bureaucratic (copying raw legal text blindly).
+           - Or factually incorrect (hallucinating addresses).
+           - Or wrong language.
+        
+        Return a JSON object with keys: 'prompt', 'chosen', 'rejected'.
         """
         
-        response = client.chat.completions.create(
-            model="deepseek/deepseek-v3.2",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
-        )
-        
-        examples.append(json.loads(response.choices[0].message.content))
+        try:
+            print(f"  [{i+1}/{count}] Requesting DPO triplet for topic: {item['vraag'][:30]}...")
+            response = client.chat.completions.create(
+                model=MODEL_NAME,
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"}
+            )
+            
+            content = json.loads(response.choices[0].message.content)
+            if all(k in content for k in ["prompt", "chosen", "rejected"]):
+                examples.append(content)
+                print(f"  Done.")
+            time.sleep(1)
+        except Exception as e:
+            print(f"Error generating DPO: {e}")
     
     return examples
 
-
 if __name__ == "__main__":
-    # Ensure data dir exists
-    os.makedirs("Jack/data", exist_ok=True)
+    # Ensure output dir exists
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
-    # 1. Load real FAQ data
-    real_data = load_real_faq_data()
+    # 1. Load Knowledge
+    kb = load_unified_knowledge()
+    if not kb:
+        print("No knowledge found. Exiting.")
+        exit(1)
+        
+    # 2. Convert real data to SFT format (Seed data)
+    # NOTE: We skip directly adding raw APV data to SFT because it might be too harsh.
+    # We only rely on the unified/synthetic generation to "soften" it.
+    # We can still add FAQ data if we trust it, but for now, let's rely on the LLM to rewrite everything.
+    # This prevents the "rude" raw strings from leaking into the training set directly.
+    print("Skipping raw data copy to prevent SFT pollution with harsh tone. Relying on synthetic rewrite.")
     
-    # 2. Generate synthetic SFT data
-    generate_sft_data(count=10)
+    # 3. Generate synthetic SFT (Multi-turn)
+    # Generating 50 examples for a solid initial finetune
+    synth_sft = generate_sft_data(kb, count=50)
     
-    # 3. Merge real + synthetic into final training file
-    with open("Jack/data/synthetic_train.jsonl", "r", encoding="utf-8") as f:
-        synthetic_data = [json.loads(line) for line in f]
+    random.shuffle(synth_sft)
     
-    combined_data = real_data + synthetic_data
-    random.shuffle(combined_data)
-    
-    with open("Jack/data/synthetic_train.jsonl", "w", encoding="utf-8") as f:
-        for ex in combined_data:
+    sft_output_path = OUTPUT_DIR / "synthetic_train.jsonl"
+    with open(sft_output_path, "w", encoding="utf-8") as f:
+        for ex in synth_sft:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
-    print(f"Combined {len(combined_data)} examples (real + synthetic) saved.")
+            
+    # 4. Generate DPO data
+    combined_dpo = generate_dpo_from_knowledge(kb, count=50)
     
-    # 4. Generate DPO data from real FAQ (better grounding)
-    dpo_from_faq = generate_dpo_from_faq(count=15)
-    
-    # 5. Also generate some purely synthetic DPO
-    generate_dpo_data(count=5)
-    
-    # 6. Merge DPO data
-    with open("Jack/data/synthetic_dpo.jsonl", "r", encoding="utf-8") as f:
-        synthetic_dpo = [json.loads(line) for line in f]
-    
-    combined_dpo = dpo_from_faq + synthetic_dpo
-    random.shuffle(combined_dpo)
-    
-    with open("Jack/data/synthetic_dpo.jsonl", "w", encoding="utf-8") as f:
+    dpo_output_path = OUTPUT_DIR / "synthetic_dpo.jsonl"
+    with open(dpo_output_path, "w", encoding="utf-8") as f:
         for ex in combined_dpo:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
-    print(f"Combined {len(combined_dpo)} DPO examples saved.")
+            
+    print(f"\nFINISH STATUS:")
+    print(f"- SFT examples: {len(synth_sft)} total (rewritten)")
+    print(f"- DPO examples: {len(combined_dpo)} total")
+    print(f"- Files saved in: {OUTPUT_DIR}")
