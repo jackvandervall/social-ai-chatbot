@@ -22,3 +22,5 @@ wheels/
 *.pt
 *.pth
 *.ckpt
+unsloth_compiled_cache/
+
