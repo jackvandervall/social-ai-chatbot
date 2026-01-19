@@ -173,7 +173,7 @@ async def main(message: cl.Message):
     # --- STEP 2: EMERGENCY BLOCKER ---
     if status.is_emergency:
         emergency_msg = (
-            f"🚨 **EMERGENCY DETECTED**\n\n"
+            f"🚨 **NOODSITUATIE GEDETECTEERD**\n\n"
             f"{PromptConfig.get_disclaimer(status.disclaimer_type)}"
         )
         await cl.Message(content=emergency_msg, author="RotterMaatje").send()
