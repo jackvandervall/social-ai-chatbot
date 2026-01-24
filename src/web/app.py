@@ -10,6 +10,7 @@ from agents.chatbot import rottermaatje_agent, AgentDeps
 from services.pgvectordb import VectorDB
 from core.prompts import PromptConfig
 from agents.triage import triage_agent, TriageStatus
+from pydantic_ai.messages import ModelMessage
 
 from core.llm import get_model
 from pydantic_ai import Agent
@@ -61,6 +62,9 @@ async def start():
     """
     # Initialize context mode in session
     cl.user_session.set("context_mode", "volunteer")
+    
+    # Initialize empty message history for conversation memory
+    cl.user_session.set("message_history", [])
     
     # Set up chat settings with context mode dropdown
     settings = await cl.ChatSettings(
@@ -187,9 +191,16 @@ async def main(message: cl.Message):
     
     # Use a step to show "thinking" until we get the first chunk
     async with cl.Step(name="Hulpbronnen raadplegen...") as thinking_step:
+        # Get conversation history from session
+        message_history: list[ModelMessage] = cl.user_session.get("message_history", [])
+        
         # Stream the response
         response_text = ""
-        async with rottermaatje_agent.run_stream(user_input, deps=deps) as result:
+        async with rottermaatje_agent.run_stream(
+            user_input, 
+            deps=deps,
+            message_history=message_history  # Pass conversation history
+        ) as result:
             # We want to close the thinking step as soon as we start getting content
             first_chunk = True
             async for chunk in result.stream_text(delta=True):
@@ -208,6 +219,9 @@ async def main(message: cl.Message):
                     response_text = str(final_data)
                     await msg.send()
                     await msg.stream_token(response_text)
+            
+            # Update message history with new messages from this turn
+            cl.user_session.set("message_history", result.all_messages())
 
     # --- STEP 4: ADD DISCLAIMER AFTER RESPONSE ---
     if status.disclaimer_type != 'none':
