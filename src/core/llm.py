@@ -18,7 +18,7 @@ def get_model():
     Returns the primary model configuration.
     """
     if MODEL_PROVIDER == 'local':
-        return 'openai:qwen/qwen3-4b-2507'
+        return 'openai:qwen/rottermaatje-qwen3-4b-dpo'
     elif MODEL_PROVIDER == 'openrouter':
         _get_api_key() # Verify key exists
         return 'openrouter:x-ai/grok-4.1-fast'
@@ -30,7 +30,7 @@ def get_triage_model():
     Returns a cheap and fast model for triage classification.
     """
     if MODEL_PROVIDER == 'local':
-        return 'openai:qwen/qwen3-0.5b'
+        return 'openai:qwen/rottermaatje-qwen3-4b-dpo'
     elif MODEL_PROVIDER == 'openrouter':
         _get_api_key() # Verify key exists
         return 'openrouter:openai/gpt-oss-safeguard-20b'

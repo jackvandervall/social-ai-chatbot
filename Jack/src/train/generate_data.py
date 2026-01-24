@@ -19,7 +19,7 @@ from pydantic import BaseModel
 
 # --- PATH CONFIGURATION ---
 ROOT_DIR = Path(__file__).resolve().parents[3]
-DATA_KNOWLEDGE_DIR = ROOT_DIR / "data" / "knowledge"
+DATA_KNOWLEDGE_DIR = ROOT_DIR / "data" / "processed"
 OUTPUT_DIR = ROOT_DIR / "Jack" / "data"
 
 # Add project root to sys.path to import src modules
@@ -103,8 +103,9 @@ def generate_sft_data(knowledge_base: List[Dict], count=10):
         Instructions:
         1. Create a conversation where a user asks about the context topic in the Target Language.
         2. The assistant responds using the SYSTEM PERSONA.
-        3. STRICTLY AVOID copying the raw Answer if it is rude, bureaucratic, or harsh (e.g. APV legal text). Adapt it to be helpful and empathetic.
-        4. Provide 2-3 turns.
+        3. CRITICAL: Only respond to what the user actually said. DO NOT assume they just got out of prison, had a divorce, etc., unless they explicitly say so.
+        4. STRICTLY AVOID copying the raw Answer if it is rude, bureaucratic, or harsh (e.g. APV legal text). Adapt it to be helpful and empathetic.
+        5. Provide 2-3 turns.
         
         Format the output as a JSON object with a 'messages' key containing a list of roles (user/assistant) and 'content'.
         """
@@ -158,12 +159,12 @@ def generate_dpo_from_knowledge(knowledge_base: List[Dict], count=15):
         1. 'prompt': A realistic user question in {lang['name']}.
         2. 'chosen': The PERFECT response in {lang['name']}. It MUST:
            - Use the System Persona (empathetic, helpful, B1 level).
-           - Use the Knowledge Source facts but REPHRASE them to be kind. NEVER be rude or bureaucratic.
-           - If the raw answer is harsh (e.g. "It's illegal, deal with it"), soften it: "Unfortunately, it is not allowed..."
+           - Only respond to the prompt's content. DO NOT assume or invent a backstory (e.g., being an ex-prisoner) if not mentioned.
+           - Use the Knowledge Source facts but REPHRASE them to be kind.
         3. 'rejected': A BAD response. It should be:
-           - Rude, dismissive, or overly bureaucratic (copying raw legal text blindly).
-           - Or factually incorrect (hallucinating addresses).
-           - Or wrong language.
+           - Rude, dismissive, or overly bureaucratic.
+           - Falsely assuming a backstory (e.g., assuming they are from prison when they didn't say so).
+           - Factually incorrect or wrong language.
         
         Return a JSON object with keys: 'prompt', 'chosen', 'rejected'.
         """
@@ -196,33 +197,30 @@ if __name__ == "__main__":
         print("No knowledge found. Exiting.")
         exit(1)
         
-    # 2. Convert real data to SFT format (Seed data)
-    # NOTE: We skip directly adding raw APV data to SFT because it might be too harsh.
-    # We only rely on the unified/synthetic generation to "soften" it.
-    # We can still add FAQ data if we trust it, but for now, let's rely on the LLM to rewrite everything.
-    # This prevents the "rude" raw strings from leaking into the training set directly.
     print("Skipping raw data copy to prevent SFT pollution with harsh tone. Relying on synthetic rewrite.")
     
     # 3. Generate synthetic SFT (Multi-turn)
-    # Generating 50 examples for a solid initial finetune
-    synth_sft = generate_sft_data(kb, count=50)
+    synth_sft = generate_sft_data(kb, count=2)
     
     random.shuffle(synth_sft)
     
-    sft_output_path = OUTPUT_DIR / "synthetic_train.jsonl"
-    with open(sft_output_path, "w", encoding="utf-8") as f:
+    sft_output_path = OUTPUT_DIR / "processed" / "synthetic_train.jsonl"
+    sft_output_path.parent.mkdir(parents=True, exist_ok=True)
+    # Append mode ("a") to add to existing data
+    with open(sft_output_path, "a", encoding="utf-8") as f:
         for ex in synth_sft:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
             
-    # 4. Generate DPO data
-    combined_dpo = generate_dpo_from_knowledge(kb, count=50)
+    combined_dpo = generate_dpo_from_knowledge(kb, count=0)
     
-    dpo_output_path = OUTPUT_DIR / "synthetic_dpo.jsonl"
-    with open(dpo_output_path, "w", encoding="utf-8") as f:
+    dpo_output_path = OUTPUT_DIR / "processed" / "synthetic_dpo.jsonl"
+    # Append mode ("a") to add to existing data
+    with open(dpo_output_path, "a", encoding="utf-8") as f:
         for ex in combined_dpo:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
             
     print(f"\nFINISH STATUS:")
-    print(f"- SFT examples: {len(synth_sft)} total (rewritten)")
-    print(f"- DPO examples: {len(combined_dpo)} total")
-    print(f"- Files saved in: {OUTPUT_DIR}")
+    print(f"- NEW SFT examples added: {len(synth_sft)}")
+    print(f"- NEW DPO examples added: {len(combined_dpo)}")
+    print(f"- Files appended in: {OUTPUT_DIR / 'processed'}")
+

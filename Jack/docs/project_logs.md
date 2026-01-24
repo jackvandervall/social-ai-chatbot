@@ -75,13 +75,11 @@ Verander het daarna in een vraag en antwoord format:
 Met deze data kan de chatbot door middel van de pgvector tool gemakkelijk de juiste informatie vinden, door de implementatie van een vector database is dit erg schaalbaar.
 
 **18-01-2026**
-Om de triage van de gebruikers input classificatie te versnellen en kostenefficiënter te maken heb ik ervoor gekozen om in llm.py de gebruikte llm op te splitten. Voor classificatie heb ik gekozen voor een API call naar Openrouter met gpt-oss-safeguard-20b, het een safety reasoning model van OpenAI, gebouwd op basis van gpt-oss-20b. Dit is een Mixture-of-Experts (MoE) model met lower latency (goed voor triage), gemaakt voor veiligheidstaken zoals content classification, LLM filtering, en trust & safety labeling. Met deze setup worden de juiste safety disclaimers gegeven en kan er tijdens een noodgeval de chat stopgezet worden, om de gebruiker direct op de hoogte te stellen van de ernst van de situatie zodat hulpdiensten z.s.m. ingeschakeld kunnen worden. (Voorbeeld: "De cliënt voelt pijn op de borst", wat kan duiden op een hartaanval)
+Om de triage van de gebruikers input classificatie te versnellen en kostenefficiënter te maken heb ik ervoor gekozen om in llm.py de gebruikte llm op te splitsen. Voor classificatie heb ik gekozen voor een API call naar Openrouter met gpt-oss-safeguard-20b, het een safety reasoning model van OpenAI, gebouwd op basis van gpt-oss-20b. Dit is een Mixture-of-Experts (MoE) model met lower latency (goed voor triage), gemaakt voor veiligheidstaken zoals content classification, LLM filtering, en trust & safety labeling. Met deze setup worden de juiste safety disclaimers gegeven en kan er tijdens een noodgeval de chat stopgezet worden, om de gebruiker direct op de hoogte te stellen van de ernst van de situatie zodat hulpdiensten z.s.m. ingeschakeld kunnen worden. (Voorbeeld: "De cliënt voelt pijn op de borst", wat kan duiden op een hartaanval)
 
 Naast het aanpassen van de triage agent, heb ik ook de bestandupload functionaliteit geïmplementeerd, hierdoor kunnen vrijwilligers intakeformulieren laten invullen en versturen voor de juiste verwijzing naar hulpinstanties. Ik heb dit uitgetest door een intakeformulier te genereren met Google Gemini Pro 3, en deze te uploaden via de frontend. Hierdoor kan de chatbot de juiste informatie uit het formulier halen en de vrijwilliger de juiste adviezen geven. De interactie ging als volgt:
 
 Hieronder is de chatbot-interactie omgezet naar een gestructureerd Markdown-format. Dit overzicht toont de effectiviteit van de hulpverlening door data-extractie te koppelen aan concrete acties.
-
-#Hieronder is de interactie vertaald en omgezet naar een gestructureerd overzicht in Markdown. Dit laat zien hoe effectief de AI schakelt tussen veiligheidscontrole, directe hulpverlening en lokale actiepunten.
 
 ---
 
@@ -153,27 +151,42 @@ De interactie sluit af met een overzicht van noodnummers en gespecialiseerde ins
 De effecitivteit is bewezen als zeer gewenst, door gebruik te maken van gpt-oss-safeguard-20b voor triage en x-ai/grok-4.1-fast voor de chatbot en toolcalls. x-ai/grok-4.1-fast vanwege de snelheid voor iteratief experimenteren en aantrekkelijke API-kosten. De locaties van de instanties zijn afkomstig uit de interne kennisbank, onder andere de faq geleverd door de Pauluskerk, dit is door de chatbot zelf geverifieerde data, door middel van vectordb queries. De chatbot stopt niet alleen bij het leveren van informatie, maar vraagt ook door voor extra informatie, zoals de inschrijfregio van de cliënt, overige zorgbehoeften en andere medische problemen. De chatbot kwam wellicht te kort bij de hoeveelheid informatie die is gegeven, het heeft bijvoorbeeld niet de financiële informatie aangekaart (premie-achterstand), maar hier is in de kennisbank ook weinig data over te vinden. Geen sturing voor de aanvraag voor Wajong of Bijstandsuitkering. (Bron: Jack\data\intake_formulier_casus.txt)
 
 **19-01-2026**
-Vandaag heb ik data gegenereerd om het qwen3-4b-instruct model te fine-tunen. Om de data te generenen heb ik Deepseek V3.2 gebruikt voor data-generatie vanwege lage kosten en meertalige kracht. De data is gegenereerd op basis van reële interacties en topics vanuit de data in de interne kennisbank. Daarnaast is ook GPO reinforcement learning toegepast, waardoor de LLM ook leert om een foutieve toon en incorrecte data te vermijden. Zelfs met quentization kon ik het niet lokaal trainen, vanwege deze error:
+Vandaag heb ik data gegenereerd om het qwen3-4b-instruct model te fine-tunen. Om de data te generenen heb ik Deepseek V3.2 gebruikt voor data-generatie vanwege lage kosten en meertalige kracht. De data is gegenereerd op basis van reële interacties en topics vanuit de data in de interne kennisbank. Daarnaast is ook DPO reinforcement learning toegepast, waardoor de LLM ook leert om een foutieve toon en incorrecte data te vermijden. Zelfs met quantization kon ik het niet lokaal trainen, vanwege deze error:
 
 >"ValueError: Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model."
 
-Vandaar dat ik het via Google Colab heb gedaan. Hieronder de resultaten:
-
-🧪 Testing fine-tuned model:
-
-The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
-
-📝 User: Ik ben dakloos en heb honger. Waar kan ik eten krijgen?...
-🤖 RotterMaatje: Ik begrijp dat het moeilijk is als je net uit de gevangenis komt. Er zijn plaatsen in Rotterdam waar je kunt eten. Bij de Pauluskerk op Delftseplein 25, de Wassel-De Vries op 's Gravendijkwal 49 en de...
-------------------------------------------------------------
-📝 User: I see a homeless person on the street. What can I do to help...
-🤖 RotterMaatje: Thank you for asking. Helping homeless individuals is important. You can support them by volunteering at Pauluskerk, donating to their cause, or reporting their presence to the municipality. If you ne...
-------------------------------------------------------------
-📝 User: أين يمكنني العثور على مأوى ليلي في روتردام؟...
-🤖 RotterMaatje: مرحبًا! نعم، يمكنني مساعدتك. مأوى NAS المخصص للبالغين موجود في فيجرهافسترات 29-31 في روتردام. هل الشخص الذي تساعده من منطقة روتردام؟ هذا مهم لتأكيد إمكانية الوصول إلى المأوى....
-------------------------------------------------------------
-📝 User: Gdzie mogę znaleźć nocleg w Rotterdamie?...
-🤖 RotterMaatje: Cześć! W Rotterdamie dostępne są różne pokoje noclegowe dla tych, którzy potrzebują mieszkania. Czy jesteś z regionu Rotterdamu lub zarejestrowałeś się w regionie ostatnio? To ważne dla dostępu do nie...
-------------------------------------------------------------
+Vandaar dat ik het via Google Colab heb gedaan.
 
 Zoals te zien is uit de test output, geeft het model op empathische manier antwoord. Er is alleen een merkwaardig antwoord gegenereerd, waarin de LLM ervan uit lijkt te gaan dat de user uit de gevangenis komt, in tegenstelling tot de initiële prompt, waarbij de user dakloos is en honger heeft. Dit kan komen door de data die is gebruikt voor het fine-tunen, waarbij er ook data is gebruikt over mensen die uit de gevangenis komen, mogelijke overtraining heeft voor deze hallucinatie gezorgt. Het is belangrijk om diverse data te hebben voor het fine-tunen om deze bias te voorkomen.
+
+* Zie volledige documentatie: \docs\findings\exp001_baseline_rottermaatje.md
+
+**21-01-2026**
+Verder gedoken in het eerste experiment (exp001_baseline_rottermaatje), resultaat geanalyseerd en geconcludeerd dat we een grotere dataset nodig hebben met diverse topics en talen. 250 meer synthetische data gegenereerd (6x het totale data volume) met een verbeterde verdeling van data over verschillende topics. 
+
+**Taalbalans**
+De verdeling is opvallend evenwichtig over alle 4 de doeltalen:
+
+Arabisch: 27,5% (SFT) / 23,0% (DPO)
+Engels: 26,8% (SFT) / 21,7% (DPO)
+Nederlands: 24,2% (SFT) / 29,0% (DPO)
+Pools: 21,5% (SFT) / 26,3% (DPO)
+
+**Onderwerpsdiversiteit** 
+Het model ziet nu een veel breder scala aan onderwerpen:
+
+Slapen/Opvang: ~33% (Dominant, zoals verwacht bij dakloosheid)
+Juridisch/ID: ~31% (Cruciaal voor BSN/registratie)
+Voedsel/Inkomen/Politie: ~12-16% per stuk
+Medisch/Verslaving/Hygiëne: Aanwezig maar minder frequent (~10% gecombineerd)
+
+**Succes tegen Hallucinaties**
+Frequentie van "Gevangenis/Cel" context:
+
+SFT: Slechts 2,0% (6 voorkomens)
+DPO: Slechts 0,7% (2 voorkomens)
+
+**24-01-2026**
+Tweede experiment uitgevoerd (zie Jack/docs/findings/exp002_instruct_rottermaatje.md), verminderde hallucinaties. Aantal features toegevoegd:
+- Short term memory door coversatiegeheugen toe te voegen, door middel van de history te updaten na elke response (result.all_messages())
+- Toolcalling schijnt lastiger te zijn voor kleine parameter LLMs, vandaar dat ik een functie heb toegevoegd om RAG uit te voeren bij iedere response dat in de context wordt toegevoegd. Dit simuleerd als het ware een toolcall naar de vector database.

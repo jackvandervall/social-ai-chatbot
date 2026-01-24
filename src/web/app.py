@@ -183,21 +183,42 @@ async def main(message: cl.Message):
         await cl.Message(content=emergency_msg, author="RotterMaatje").send()
         return  # Stop here for emergencies
 
-    # --- STEP 3: MAIN AGENT WITH STREAMING ---
+    # --- STEP 3: ALWAYS-ON RAG (4B model can't do tool calling properly) ---
+    rag_context = ""
+    async with cl.Step(name="Kennisbank raadplegen") as rag_step:
+        results = await db.search(user_input)
+        if results:
+            contents = [r["content"] for r in results]
+            rag_context = "\n- ".join(contents)
+            rag_step.output = f"✅ {len(results)} resultaten gevonden"
+        else:
+            rag_step.output = "Geen specifieke informatie gevonden"
+    
+    # Inject RAG context into user input
+    augmented_input = user_input
+    if rag_context:
+        augmented_input = f"""{user_input}
+
+---
+[KENNISBANK INFORMATIE - Gebruik dit voor je antwoord]
+- {rag_context}
+---"""
+    
+    # --- STEP 4: MAIN AGENT WITH STREAMING ---
     deps = AgentDeps(db=db, triage_data=status, context_mode=context_mode)
     
     # Create empty message for streaming
     msg = cl.Message(content="")
     
     # Use a step to show "thinking" until we get the first chunk
-    async with cl.Step(name="Hulpbronnen raadplegen...") as thinking_step:
+    async with cl.Step(name="Antwoord genereren...") as thinking_step:
         # Get conversation history from session
         message_history: list[ModelMessage] = cl.user_session.get("message_history", [])
         
         # Stream the response
         response_text = ""
         async with rottermaatje_agent.run_stream(
-            user_input, 
+            augmented_input,  # Use RAG-augmented input 
             deps=deps,
             message_history=message_history  # Pass conversation history
         ) as result:
