@@ -38,6 +38,14 @@ Type your question in any supported language: Dutch, English, Polish, or Arabic.
 
 ---
 
+## Tips for Best Results
+
+1. **Be specific** - Provide details about the person's situation
+2. **One question at a time** - Get clearer, more helpful answers
+3. **Use translation** - Share translated responses directly with the person you're helping
+
+---
+
 ## 🇳🇱 Nederlands
 
 Welkom bij **RotterMaatje**, je AI-assistent voor daklozenopvang in Rotterdam.
@@ -62,7 +70,7 @@ Typ je vraag in een ondersteunde taal: Nederlands, Engels, Pools of Arabisch.
 
 | Dienst | Telefoon | Website |
 |--------|----------|---------|
-| **Noodgvallen** | 112 | [Politie](https://www.politie.nl) |
+| **Noodgevallen** | 112 | [Politie](https://www.politie.nl) |
 | **Zelfmoordpreventie** | 0900-0113 | [113.nl](https://www.113.nl) |
 | **Huiselijk Geweld** | 0800-2000 | [Veilig Thuis](https://www.veiligthuis.nl/nl/contact) |
 | **Slachtofferhulp** | 0900-0101 | [Slachtofferhulp](https://www.slachtofferhulp.nl) |
@@ -71,6 +79,14 @@ Typ je vraag in een ondersteunde taal: Nederlands, Engels, Pools of Arabisch.
 | **Straatconsulaat** | 070-3467644 | [Straatconsulaat](https://www.straatconsulaat.nl) |
 | **Gemeente (APV)** | 14 010 | [Rotterdam.nl](https://www.rotterdam.nl/apv) |
 | **Pauluskerk** | 010-411 81 32 | [Pauluskerk](https://www.pauluskerkrotterdam.nl/contact/) |
+
+---
+
+## Tips voor het beste resultaat
+
+1. **Wees specifiek** - Geef details over de situatie van de persoon
+2. **Eén vraag tegelijk** - Krijg duidelijkere, nuttigere antwoorden
+3. **Gebruik vertaling** - Deel vertaalde antwoorden direct met de persoon die je helpt
 
 ---
 

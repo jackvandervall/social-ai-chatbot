@@ -40,12 +40,12 @@ graph TD
 
 ## Tech Stack
 
-- **Core**: [Python 3.12+](https://www.python.org/), [`Pydantic‑AI`](src/agent.py) (agents/tools)
+- **Core**: [Python 3.12+](https://www.python.org/), [`Pydantic‑AI`](src/agents/chatbot.py) (agents/tools)
 - **LLM**: OpenAI‑compatible (local via LMStudio/Ollama or OpenRouter)
 - **UI**: [Chainlit](https://docs.chainlit.io/)
 - **Database**: Supabase (pgvector)
-- **Prompts/Guardrails**: [`src/prompts.py`](src/prompts.py) – now includes triage prompt and disclaimer config
-- **Triage Module**: [`src/triage.py`](src/triage.py) – dedicated classification agent
+- **Prompts/Guardrails**: [`src/core/prompts.py`](src/core/prompts.py) – includes triage prompt and disclaimer config
+- **Triage Module**: [`src/agents/triage.py`](src/agents/triage.py) – dedicated classification agent
 - **Dependencies**: Managed via [uv](https://astral.sh/uv) + [`pyproject.toml`](pyproject.toml) (Torch, Transformers, HuggingFace, etc. for potential local models)
 - **Package Manager**: uv (faster pip alternative)
 
