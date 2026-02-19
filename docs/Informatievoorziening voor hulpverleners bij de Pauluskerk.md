@@ -2,10 +2,10 @@
 
 # INFORMATIEVERZIENING VOOR HULPVERLENERS BIJ DE PAULUSKERK
 
-**Brendan van der Sman 1016636**  
-**Najah Khalifa: 1076514**  
-**Jack van der Vall: 1081981**  
-**Celine Scova Righini 1077277**
+**Brendan van der Sman**  
+**Najah Khalifa**  
+**Jack van der Vall**  
+**Celine Scova Righini**
 
 **Datum: 25/01/2026**
 
