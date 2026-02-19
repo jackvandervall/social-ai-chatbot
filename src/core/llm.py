@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
 
 load_dotenv()
 
@@ -13,6 +15,20 @@ def _get_api_key():
         raise ValueError("OPENROUTER_API_KEY not found in environment variables")
     return OPENROUTER_API_KEY
 
+def _get_openrouter_model(model_name: str) -> OpenAIChatModel:
+    """
+    Creates an OpenAI-compatible model pointing to OpenRouter's API.
+    This bypasses PydanticAI's OpenRouterModel which has a validation bug
+    with upstream_inference_cost expecting int instead of float.
+    """
+    return OpenAIChatModel(
+        model_name,
+        provider=OpenAIProvider(
+            base_url='https://openrouter.ai/api/v1',
+            api_key=_get_api_key(),
+        ),
+    )
+
 def get_model():
     """
     Returns the primary model configuration.
@@ -20,8 +36,7 @@ def get_model():
     if MODEL_PROVIDER == 'local':
         return 'openai:qwen/rottermaatje-qwen3-4b-dpo'
     elif MODEL_PROVIDER == 'openrouter':
-        _get_api_key() # Verify key exists
-        return 'openrouter:x-ai/grok-4.1-fast'
+        return _get_openrouter_model('google/gemini-3-flash-preview')
     else:
         raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be 'openrouter' or 'local'")
 
@@ -32,7 +47,6 @@ def get_triage_model():
     if MODEL_PROVIDER == 'local':
         return 'openai:qwen/rottermaatje-qwen3-4b-dpo'
     elif MODEL_PROVIDER == 'openrouter':
-        _get_api_key() # Verify key exists
-        return 'openrouter:openai/gpt-oss-safeguard-20b'
+        return _get_openrouter_model('openai/gpt-oss-safeguard-20b')
     else:
         raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be 'openrouter' or 'local'")

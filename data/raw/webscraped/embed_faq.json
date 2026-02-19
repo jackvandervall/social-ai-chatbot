@@ -1,0 +1,169 @@
+{
+  "name": "embed_faq",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "bcdd539e-4a24-44fc-ad46-bad01123d5f3",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// PASTE THE FULL DUTCH JSON DATA HERE FROM THE PREVIOUS STEP\nconst faqData = [\n[\n  {\n    \"vraag\": \"Ik ben dakloos uit Rotterdam en zoek een slaapplaats.\",\n    \"antwoord\": \"Bij Centraal Onthaal, Delftseplein 29 kunt u vragen naar een Centraal Onthaalpas, daarmee krijgt u toegang tot de nachtopvang (NAS).\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"Centraal Onthaal\", \"NAS\", \"Delftseplein\", \"CO-pas\"]\n    }\n  },\n  {\n    \"vraag\": \"Wat kost de nachtopvang?\",\n    \"antwoord\": \"De opvangkosten worden afgetrokken van uw uitkering.\",\n    \"metadata\": {\n      \"categorie\": \"Financieel\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"kosten\", \"eigen bijdrage\", \"uitkering\"]\n    }\n  },\n  {\n    \"vraag\": \"Waar vind ik de nachtopvang in Rotterdam?\",\n    \"antwoord\": \"De NAS is aan de vijverhofstraat 35-37 in Rotterdam.\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"NAS\", \"locatie\", \"Vijverhofstraat\"]\n    }\n  },\n  {\n    \"vraag\": \"De gemeente geeft mij geen Centraal Onthaalpas wat kan ik doen?\",\n    \"antwoord\": \"U kunt in bezwaar tegen het besluit. Vraag juridische hulp bij het juridisch loket.\",\n    \"metadata\": {\n      \"categorie\": \"Juridisch\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"bezwaar\", \"juridisch loket\", \"weigering\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik heb geen geld waar kan ik eten?\",\n    \"antwoord\": \"Er is de hele dag gratis brood, koffie en thee in de Pauluskerk, Mauritsweg 20 te Rotterdam. Van maandag-vrijdag om 16.45 uur gaat de deur open voor een warme maaltijd (1 euro). In het weekend is er regelmatig soep om 13 of 17 uur. Op woensdag gratis soep bij station Blaak. Zusters aan de 's Gravendijkwal 13 delen op donderdag en zaterdag eten uit. Gaarkeuken: Proveniersstraat 6, aanvang 17 uur (ma-vr).\",\n    \"metadata\": {\n      \"categorie\": \"Voeding\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"Pauluskerk\", \"Gaarkeuken\", \"gratis eten\", \"soep\"]\n    }\n  },\n  {\n    \"vraag\": \"Waar kan ik douchen?\",\n    \"antwoord\": \"Douchegelegenheid is er bij: NAS (Vijverhofstraat 35-37, met CO-pas), Pauluskerk (Mauritsweg 20, vrij toegang), Stichting Ontmoeting ('s Gravendijkwal 95, met toegangspas), De Sluis (Westzeedijk 493, met pas).\",\n    \"metadata\": {\n      \"categorie\": \"Hygiëne\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"douchen\", \"wassen\", \"sanitair\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben niet verzekerd en heb hulp van een huisarts nodig.\",\n    \"antwoord\": \"Ga naar Straatzorg Rotterdam, Mathenesserlaan 433. Tel: 010-3188188. Inloopspreekuur: ma-di en do tussen 9-11.00 uur.\",\n    \"metadata\": {\n      \"categorie\": \"Medisch\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"Straatzorg\", \"huisarts\", \"onverzekerd\", \"zorg\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben dakloos en zoek een huis.\",\n    \"antwoord\": \"Schrijf u in bij Woonnet Rijnmond of andere corporaties. Wachttijd is enkele jaren (55+) tot gemiddeld 9 jaar (anderen). Zoek particulier of vraag netwerk om een kamer.\",\n    \"metadata\": {\n      \"categorie\": \"Wonen\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"Woonnet Rijnmond\", \"sociale huur\", \"wachttijd\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben dakloos en wil een postadres.\",\n    \"antwoord\": \"Vraag aan bij gemeente Rotterdam (website of Delftsepoort 29). Vermeld minimaal 3 slaapadressen en oorzaak dakloosheid.\",\n    \"metadata\": {\n      \"categorie\": \"Administratie\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"postadres\", \"briefadres\", \"gemeente\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik kom uit Nederlandse Antillen, heb een Nederlands paspoort, maar geen BSN.\",\n    \"antwoord\": \"Vraag een BSN aan bij een RNI loket bij een aantal gemeenten in Nederland (afspraak maken via website).\",\n    \"metadata\": {\n      \"categorie\": \"Administratie\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"BSN\", \"RNI\", \"Antillen\", \"registratie\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik heb geen schone kleding, waar kan ik die krijgen?\",\n    \"antwoord\": \"Pauluskerk (Mauritsweg 20): ma, wo, vr 10-11 uur gratis kleding. Weggeefwinkel (Schoterbosstraat 4): elke woensdag 10-14 uur.\",\n    \"metadata\": {\n      \"categorie\": \"Kleding\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"kledinguitgifte\", \"Pauluskerk\", \"Weggeefwinkel\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben Nederlander, heb geen ID meer en geen geld voor paspoort.\",\n    \"antwoord\": \"1. Doe aangifte van vermissing bij politie. 2. Vraag bijzondere bijstand voor ID-kosten bij Sociale Dienst (Coolsingel 40).\",\n    \"metadata\": {\n      \"categorie\": \"Juridisch\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"ID-kaart\", \"paspoort\", \"bijzondere bijstand\", \"identiteitsbewijs\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik kom uit Europees land en wil terug naar mijn land, maar heb geen geld.\",\n    \"antwoord\": \"Vraag hulp aan Stichting Barka (030-2689242) of Stichting Ontmoeting ('s Gravendijkwal 95, spreekuur 9.30-11.30).\",\n    \"metadata\": {\n      \"categorie\": \"Remigratie\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"terugkeer\", \"Barka\", \"EU\", \"repatriëring\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben Nederlander, dakloos en heb geen werk en geen inkomen.\",\n    \"antwoord\": \"Net werkloos? Vraag WW aan bij UWV. Langer werkloos? Vraag Bijstand bij Sociale Dienst (Coolsingel 40).\",\n    \"metadata\": {\n      \"categorie\": \"Financieel\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"uitkering\", \"WW\", \"Bijstand\", \"UWV\", \"Sociale Dienst\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben verslaafd en wil afkicken.\",\n    \"antwoord\": \"Ga naar je huisarts voor verwijzing. Geen huisarts? Ga naar Straatzorg Rotterdam (Mathenesserlaan 433, 010-3188188).\",\n    \"metadata\": {\n      \"categorie\": \"Medisch\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"verslaving\", \"detox\", \"afkicken\", \"kliniek\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben dakloos en kom NIET uit Rotterdam kan ik in Rotterdam naar de nachtopvang?\",\n    \"antwoord\": \"Nee, meld je bij de gemeente waar je het laatst ingeschreven stond. Rotterdam biedt niet automatisch opvang vanwege regiobinding.\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"regiobinding\", \"buiten Rotterdam\", \"toegang\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben EU burger zonder werk en zoek een slaapplaats. Ik heb nog niet gewerkt in Nederland.\",\n    \"antwoord\": \"U heeft geen toegang tot opvang in Rotterdam. U moet zelf slaapplaats en werk zoeken.\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"EU\", \"arbeidsmigrant\", \"geen recht\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik heb geen geldige papieren (ongedocumenteerd).\",\n    \"antwoord\": \"Steunpunt Ongedocumenteerden Pauluskerk (Mauritsweg 20). Spreekuur ma en do 10-12 uur.\",\n    \"metadata\": {\n      \"categorie\": \"Juridisch\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"ongedocumenteerd\", \"illegaal\", \"verblijfsstatus\", \"Pauluskerk\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik zie een dakloze op straat, wat kan ik doen?\",\n    \"antwoord\": \"Maak contact, vraag of ze eten/drinken nodig hebben. Verwijs naar Pauluskerk (Mauritsweg 20) voor gratis brood/koffie.\",\n    \"metadata\": {\n      \"categorie\": \"Maatschappelijk\",\n      \"doelgroep\": \"omgeving\",\n      \"trefwoorden\": [\"hulp bieden\", \"burger\", \"signalering\"]\n    }\n  },\n  {\n    \"vraag\": \"Er is een dakloze die in mijn portiek slaapt, wat kan ik doen?\",\n    \"antwoord\": \"Maak contact, vraag of ze iets nodig hebben. Verwijs naar Pauluskerk. Bij overlast: vraag vriendelijk of ze een andere plek zoeken of meld bij politie.\",\n    \"metadata\": {\n      \"categorie\": \"Overlast\",\n      \"doelgroep\": \"omgeving\",\n      \"trefwoorden\": [\"portiek\", \"slapen\", \"overlast\", \"politie\"]\n    }\n  },\n  {\n    \"vraag\": \"Mijn postadres aanvraag is afgewezen.\",\n    \"antwoord\": \"Begrijpt u de brief niet? Vraag hulp bij Pauluskerk. Bent u het oneens? Vraag hulp om bezwaar te maken.\",\n    \"metadata\": {\n      \"categorie\": \"Administratie\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"afwijzing\", \"bezwaar\", \"postadres\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik ben uit de opvang geschorst, waar kan ik slapen?\",\n    \"antwoord\": \"Meld je bij Centraal Onthaal voor de wachtlijst. Anders tot 21 uur bij NAS (Vijverhofstraat) voor vervoer naar EU opvang Zestienhoven.\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"schorsing\", \"noodopvang\", \"straatverbod\"]\n    }\n  },\n  {\n    \"vraag\": \"Het is buiten 0 graden, waar kan ik slapen (Winteropvang)?\",\n    \"antwoord\": \"De winteropvang (WCR) opent bij 0 graden. Meld je tot 21 uur bij NAS (Vijverhofstraat 35-37). Je wordt met bus naar Zestienhoven gebracht.\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"winteropvang\", \"kou\", \"vorst\", \"WCR\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik kom uit de gevangenis, waar kan ik slapen?\",\n    \"antwoord\": \"Ga terug naar gemeente van inschrijving (u heeft reisgeld gehad). Inwoners Rotterdam: meld bij Reclassering en gemeente (Delftseplein 29).\",\n    \"metadata\": {\n      \"categorie\": \"Opvang\",\n      \"doelgroep\": \"cliënt\",\n      \"trefwoorden\": [\"gevangenis\", \"detentie\", \"reclassering\", \"vrijlating\"]\n    }\n  },\n  {\n    \"vraag\": \"Er zitten vaak mensen bij jullie ingang. Kan daar iets aan gedaan worden?\",\n    \"antwoord\": \"Als wij gesloten zijn, wachten mensen soms buiten. Wij zijn open van 9:00-21:00. Bij overlast spreken wij bezoekers aan of vragen hen naar een andere plek te gaan.\",\n    \"metadata\": {\n      \"categorie\": \"Overlast\",\n      \"doelgroep\": \"omgeving\",\n      \"trefwoorden\": [\"ingang\", \"hangen\", \"wachten\"]\n    }\n  },\n  {\n    \"vraag\": \"Wat doen jullie als iemand agressief is op straat?\",\n    \"antwoord\": \"Als het kan, spreken wij ze aan. Bij onveilige situaties bellen we de politie/wijkagent. Vaak helpen bezoekers ook om in te grijpen.\",\n    \"metadata\": {\n      \"categorie\": \"Veiligheid\",\n      \"doelgroep\": \"omgeving\",\n      \"trefwoorden\": [\"agressie\", \"veiligheid\", \"ruzie\"]\n    }\n  },\n  {\n    \"vraag\": \"Ik zie regelmatig afval en overlast rond het pand.\",\n    \"antwoord\": \"Meld zwerfafval bij de gemeente. U kunt het ook bij ons melden; vaak ruimen wij het samen met bezoekers op.\",\n    \"metadata\": {\n      \"categorie\": \"Overlast\",\n      \"doelgroep\": \"omgeving\",\n      \"trefwoorden\": [\"afval\", \"schoonmaak\", \"zwerfafval\"]\n    }\n  }\n]\n];\n\n// Transform for Vector Store Node\nreturn faqData.map(item => {\n  return {\n    json: {\n      // This is the text the AI will actually read and embed\n      pageContent: `Vraag: ${item.vraag}\\nAntwoord: ${item.antwoord}`,\n      // This is the metadata for filtering\n      metadata: {\n        ...item.metadata,\n        // We add source_type here too so the AI can filter on it easily via metadata\n        source_type: 'faq',\n        bron_vraag: item.vraag,\n        trefwoorden: item.metadata.trefwoorden.join(\", \")\n      }\n    }\n  };\n});"
+      },
+      "id": "b9914425-7c6f-48d8-9e7d-ac738723313d",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "knowledge_base",
+          "mode": "list",
+          "cachedResultName": "knowledge_base"
+        },
+        "options": {}
+      },
+      "id": "9631ba77-4f95-4fee-b05f-e699a4f7b6ae",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -176
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1D3qpisQFH2g98Cn",
+          "name": "RotterMaatje API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "id": "4b20f5a9-fc51-4388-8492-4568323b29b3",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        16
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "rZ6TM6UOZG3alz3E",
+          "name": "embedding_model"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        32
+      ],
+      "id": "06d664bc-1ddf-4638-bab4-fcd6583e1627",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        176
+      ],
+      "id": "c2238501-4994-4abc-b76d-def5c1882f19",
+      "name": "Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b5914a64-c2dd-4a59-a197-620a7eae65ed",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "499d7b347ea857a2d768e1a3f1e73147adfd64ac21f3848268e48ffd491aa230"
+  },
+  "id": "4vS7mTNBVQ53nAgH",
+  "tags": []
+}

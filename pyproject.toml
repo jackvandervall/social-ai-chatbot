@@ -1,7 +1,7 @@
 [project]
 name = "rottermaatje"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI-powered triage and information chatbot for homeless aid volunteers at Pauluskerk Rotterdam."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -17,12 +17,13 @@ dependencies = [
     "psycopg2-binary>=2.9.11",
     "pydantic>=2.12.5",
     "pydantic-ai>=1.24.0",
+    "python-docx>=1.2.0",
     "torch>=2.5.0", # Note: 2.9.1 might not exist yet on the CUDA index; relaxed to 2.5.0+
     "torchaudio>=2.5.0",
     "torchvision>=0.20.0",
     "transformers>=4.47.0",
     "trl>=0.24.0",
-    "unsloth[windows]",
+    # "unsloth[windows]", # Commented out for local Windows dev compatibility (requires specific CUDA setup)
 ]
 
 # -----------------------------------------------------------------------------

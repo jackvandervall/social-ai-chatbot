@@ -1,90 +1,131 @@
 # RotterMaatje
 
-[![Python](https://img.shields.io/badge/Python->=3.12-blue)](https://www.python.org/)
-[![Chainlit](https://img.shields.io/badge/Chainlit-UI-orange)](https://docs.chainlit.io/)
+> **[Project Report: Informatievoorziening voor hulpverleners bij de Pauluskerk](docs/Informatievoorziening%20voor%20hulpverleners%20bij%20de%20Pauluskerk.md)**  
+> Full project report (Dutch): covers problem analysis, methodology, architecture decisions, and evaluation.
 
 ## Description
+This project implements an AI-powered triage and information chatbot designed to assist volunteers at the Pauluskerk in Rotterdam. It uses a multi-agent architecture with Retrieval-Augmented Generation (RAG) to provide accurate, real-time information on shelter, food, and medical services for homeless individuals. The system features a dedicated safety triage agent, a vector-based knowledge retrieval pipeline, and supports multilingual interactions in Dutch, English, Polish, and Arabic. A custom fine-tuned LLM (Qwen3-4B) was trained via SFT and DPO as a research experiment.
 
-**RotterMaatje** is an AI-powered chatbot designed for volunteers at [Pauluskerk Rotterdam](https://pauluskerkrotterdam.nl/) to assist "dak- en thuislozen" (homeless individuals) in finding essential services such as shelter, food, socialization opportunities, and medical care. 
+## Key Features
+* Classifies user intent and emergency status through a dedicated **Triage Agent** (topic, language, urgency, disclaimer level).
+* Retrieves verified information from a **Supabase `pgvector`** knowledge base (APV regulations, shelter data, FAQ).
+* Generates context-aware, empathetic responses using **PydanticAI** agents with configurable LLM backends (OpenRouter API or local model).
+* Enforces safety through **real-time guardrails**, emergency detection, and automatic disclaimer injection.
+* Supports **two operating modes**: Volunteer Mode (guiding staff) and Direct Mode (speaking to the person in need).
+* Provides **one-click translation** of responses into Polish, Arabic, and English via the Chainlit Web UI.
+* Includes a complete **fine-tuning pipeline** (SFT + DPO) with synthetic data generation, training scripts, and a published model on Hugging Face.
 
-The bot provides **accurate, real-time information** aggregated from sources like the Rotterdam municipality, shelter websites, Rode Kruis, Leger des Heils, and more. It features multilingual support (Dutch, English, Polish, Arabic), safety guardrails for emergency detection, and Retrieval-Augmented Generation (RAG) for factual and relevant responses.
-
-Currently in **early development**: Terminal mode fully functional, Web UI (Chainlit) in progress.
-
-## Features
-
-- **Multilingual Support**: Detects and responds in Dutch, English, Polish, Arabic.
-- **RAG Knowledge Base**: Vector search for shelters, medical services, procedures, legal information.
-- **AI‑Driven Triage**: Dedicated Pydantic‑AI agent classifies each user input into topic, language, emergency status, and disclaimer level (none/info/caution/urgent). Replaces hardcoded keyword detection with nuanced context‑aware classification.
-- **Safety Guardrails**: Pre‑processing blocks spam/empty input; post‑processing adds appropriate disclaimers based on triage results.
-- **Dual Interfaces**:
-  - Terminal mode for quick testing (`src/main.py`).
-  - Web UI with Chainlit (`src/web/app.py`).
-- **Flexible LLM Backend**: Local (LMStudio, e.g., Qwen3‑4B) or OpenRouter (e.g., DeepSeek V3.2).
-- **Pydantic‑AI Agent**: Structured tools/dependencies for reliable execution; main agent receives triage data for context‑aware responses.
-- **Non‑blocking Emergency Handling**: Emergency alerts are shown but the conversation continues, ensuring usability while prioritizing safety.
+## Technologies Used
+Python, PydanticAI, Chainlit, Supabase (pgvector), OpenAI Embeddings, Sentence Transformers, Unsloth, TRL (SFT + DPO), Hugging Face, UV.
 
 ## Architecture
 
-```mermaid
-graph TD
-    A[User Input<br/>Terminal or Web UI] --> B[TriageAgent<br/>Classify: topic/lang/emergency/disclaimer]
-    B -->|is_emergency=true| C[🚨 Emergency Alert<br/>Prepend Disclaimer]
-    B -->|Safe| D[Basic Pre‑checks<br/>Empty/Spam/Length]
-    D --> E[Main Agent<br/>w/ RAG Tool & triage_data]
-    E --> F[Post‑process<br/>Add disclaimer if needed]
-    F --> G[Final Response]
-    style C fill:#ff9999
-    style G fill:#99ff99
+```
+User Query
+    │
+    ▼
+┌──────────────┐     ┌────────────────────┐
+│ Triage Agent │────▶│ Classification     │
+│ (Safety)     │     │ topic, language,   │
+└──────┬───────┘     │ emergency, disclaimer│
+       │             └────────────────────┘
+       ▼
+┌──────────────┐     ┌────────────────────┐
+│ RAG Agent    │────▶│ pgvector Search    │
+│ (PydanticAI) │     │ (Supabase)         │
+└──────┬───────┘     └────────────────────┘
+       │
+       ▼
+┌──────────────┐
+│ LLM Response │──── + Disclaimer + Translation
+│ (Chainlit UI)│
+└──────────────┘
 ```
 
-## Tech Stack
+## Fine-Tuned Model (Experimental)
 
-- **Core**: [Python 3.12+](https://www.python.org/), [`Pydantic‑AI`](src/agents/chatbot.py) (agents/tools)
-- **LLM**: OpenAI‑compatible (local via LMStudio/Ollama or OpenRouter)
-- **UI**: [Chainlit](https://docs.chainlit.io/)
-- **Database**: Supabase (pgvector)
-- **Prompts/Guardrails**: [`src/core/prompts.py`](src/core/prompts.py) – includes triage prompt and disclaimer config
-- **Triage Module**: [`src/agents/triage.py`](src/agents/triage.py) – dedicated classification agent
-- **Dependencies**: Managed via [uv](https://astral.sh/uv) + [`pyproject.toml`](pyproject.toml) (Torch, Transformers, HuggingFace, etc. for potential local models)
-- **Package Manager**: uv (faster pip alternative)
+> **Note:** The fine-tuned LLM is a **research prototype** demonstrating the SFT + DPO training pipeline. For production use, the application defaults to API-based models via OpenRouter.
 
-## Quick Start
+A custom version of `Qwen/Qwen3-4B-Instruct` was fine-tuned for empathetic, multilingual support in the Rotterdam social services domain.
 
-### Prerequisites
-- [uv](https://astral.sh/uv) (recommended) or pip
-- Local LLM (e.g., LMStudio with Qwen3‑4B) or OpenRouter API key
+### Training Pipeline
+1. **Synthetic Data Generation** — Conversations generated from real FAQ/APV data across four languages using DeepSeek V3 via OpenRouter.
+2. **SFT (Supervised Fine-Tuning)** — ~300 examples, LoRA rank 16, trained with Unsloth + TRL `SFTTrainer`.
+3. **DPO (Direct Preference Optimization)** — ~300 preference pairs (chosen vs. rejected), aligning the model with safety and accuracy preferences.
 
-### Installation
-1. Clone the repo:
-   ```
-   git clone https://gitlab.cmi.hro.nl/ncbj/rottermaatje.git
-   cd rottermaatje
-   ```
-2. Install dependencies:
-   ```
-   uv sync  # or pip install -e .
-   ```
-3. Setup environment [`cp .env.example .env`](.env.example) and edit:
-   ```
-   MODEL_PROVIDER=local  # or openrouter
-   OPENROUTER_API_KEY=sk-or-v1-...  # if using OpenRouter
-   OPENAI_BASE_URL=http://localhost:1234/v1  # LMStudio default
-   DATABASE_URL=postgresql://user:pass@localhost:5432/rottermaatje  # future
-   ```
+### Training Data Distribution
+| Language | SFT   | DPO   |
+|----------|-------|-------|
+| Arabic   | 27.5% | 23.0% |
+| English  | 26.8% | 21.7% |
+| Dutch    | 24.2% | 29.0% |
+| Polish   | 21.5% | 26.3% |
 
-### Usage
+### Hugging Face Resources
+- **Model:** [jackvandervall/rottermaatje-4b-dpo](https://huggingface.co/jackvandervall/rottermaatje-4b-dpo)
+- **Dataset:** [jackvandervall/rottermaatje-synthetic-corpus](https://huggingface.co/datasets/jackvandervall/rottermaatje-synthetic-corpus)
 
-#### Terminal Mode
+### Training Loss
+![Training metrics showing SFT and DPO loss curves](https://cdn-uploads.huggingface.co/production/uploads/63f625d54b831cc179bcae90/398t3ZJJYZlPxBrFwcaiC.png)
+
+## Installation
+```bash
+git clone https://github.com/jackvandervall/rottermaatje.git
+uv sync
 ```
-python src/main.py
-```
-- Interactive chat: Type queries, `exit` to quit.
-- Example: "Waar kan ik nachtopvang vinden?"
-- The terminal shows triage classification (topic, language, emergency status) before each response.
 
-#### Web UI (Chainlit)
-```
+## Usage
+```bash
+# Setup environment variables (one-time)
+cp .env.example .env
+# Required: OPENROUTER_API_KEY, OPENAI_API_KEY, DATABASE_URL (Supabase)
+
+# Ingest knowledge base into Supabase (one-time)
+uv run python scripts/ingest_knowledge.py
+
+# Run the terminal interface
+uv run python src/main.py
+
+# Launch the web application
 uv run chainlit run src/web/app.py
 ```
-- Open `http://localhost:8000`
+
+## Demo
+
+### User Journey
+The screenshots below show the system's internal reasoning — from receiving a user query, through triage classification and knowledge retrieval, to generating a safe, translated response.
+
+| Step | Description | Screenshot |
+|------|-------------|------------|
+| **1. User Query** | A user asks for help (e.g., "I am homeless"). | <img src="docs/presentation/demo_screenshots/00_rag_test_user_query.png" width="100%" /> |
+| **2. Triage & Safety** | The Triage Agent classifies intent, detects "homelessness" (not an emergency), and routes to the RAG pipeline. | <img src="docs/presentation/demo_screenshots/01_rag_test_safety_triage_and_toolcalling.png" width="100%" /> |
+| **3. Knowledge Retrieval** | The system searches the `pgvector` database for relevant shelter information. | <img src="docs/presentation/demo_screenshots/02_rag_test_vectordb_knowledge.png" width="100%" /> |
+| **4. Generated Response** | The LLM generates an empathetic response in Dutch using the retrieved context. | <img src="docs/presentation/demo_screenshots/03_rag_test_chatbot_response.png" width="100%" /> |
+| **5. Multilingual Output** | The response is translated to Arabic while maintaining accuracy. | <img src="docs/presentation/demo_screenshots/04_rag_test_chatbot_response_arabic.png" width="100%" /> |
+
+## Project Structure
+```
+src/
+├── agents/          # PydanticAI agent definitions (chatbot + triage)
+├── core/            # LLM configuration, system prompts, guardrails
+├── services/        # pgvector database client (Supabase)
+└── web/             # Chainlit web application
+scripts/
+├── ingest_knowledge.py       # Knowledge base ingestion pipeline
+└── training/
+    ├── finetune.py            # SFT training script (Unsloth + LoRA)
+    ├── train_dpo.py           # DPO alignment script
+    └── generate_data.py       # Synthetic data generation
+data/
+├── processed/       # Structured JSON for knowledge base & training
+└── raw/             # Source documents (APV, FAQ, web scrapes)
+docs/                # Requirements, experiment logs, research paper
+```
+
+## Credits
+Developed by Jack van der Vall in collaboration with Najah Khalifa, Celine Scova Righini and Brendan van der Sman.
+
+Built for the volunteers at [Pauluskerk Rotterdam](https://www.pauluskerkrotterdam.nl/). Inspired by RotterMaatje 1.0, originally developed by Constantijn Rijsdijk at Cegeka, who served as a stakeholder in our project.
+
+## License
+This project is licensed under the MIT License.
