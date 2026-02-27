@@ -125,7 +125,5 @@ docs/                # Requirements, experiment logs, research paper
 ## Credits
 Developed by Jack van der Vall in collaboration with Najah Khalifa, Celine Scova Righini and Brendan van der Sman.
 
-Built for the volunteers at [Pauluskerk Rotterdam](https://www.pauluskerkrotterdam.nl/). Inspired by RotterMaatje 1.0, originally developed by Constantijn Rijsdijk at Cegeka, who served as a stakeholder in our project.
-
 ## License
 This project is licensed under the MIT License.
